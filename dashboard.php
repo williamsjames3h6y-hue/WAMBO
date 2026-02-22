@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-$heroImages = ['/AI.jpg', '/AI2.jpg', '/AI3.jpg', '/AI4.jpg', '/AI5.jpg'];
+$heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/AI4.jpg', '/public/AI5.jpg'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +99,7 @@ $heroImages = ['/AI.jpg', '/AI2.jpg', '/AI3.jpg', '/AI4.jpg', '/AI5.jpg'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - EarningsLLC</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <link rel="icon" type="image/jpeg" href="/public/logo.jpg">
     <style>
         @keyframes slide-fade { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

@@ -21,7 +21,7 @@ $tiers = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EarningsLLC - Professional Data Annotation Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <link rel="icon" type="image/jpeg" href="/public/logo.jpg">
     <style>
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
@@ -61,7 +61,7 @@ $tiers = $stmt->fetchAll();
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-3 group">
-                    <img src="/logo.jpg" alt="EarningsLLC Logo" class="w-12 h-12 rounded-lg object-cover shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <img src="/public/logo.jpg" alt="EarningsLLC Logo" class="w-12 h-12 rounded-lg object-cover shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <span class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                         EarningsLLC
                     </span>
@@ -111,7 +111,7 @@ $tiers = $stmt->fetchAll();
             </div>
             <div class="relative">
                 <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-3xl transform rotate-3 opacity-30 blur-sm"></div>
-                <img src="/5.jpg" alt="AI Data Annotation" class="relative rounded-3xl shadow-2xl w-full hover:scale-105 transition-transform duration-500 border border-emerald-500/30">
+                <img src="/public/5.jpg" alt="AI Data Annotation" class="relative rounded-3xl shadow-2xl w-full hover:scale-105 transition-transform duration-500 border border-emerald-500/30">
             </div>
         </div>
     </section>
@@ -127,30 +127,30 @@ $tiers = $stmt->fetchAll();
                 <div class="flex animate-scroll">
                     <div class="flex space-x-12 items-center px-6">
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/CHATGPT.webp" alt="ChatGPT" class="max-w-full max-h-full object-contain">
+                            <img src="/public/CHATGPT.webp" alt="ChatGPT" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/GOOGLE_GEMINI.png" alt="Google Gemini" class="max-w-full max-h-full object-contain">
+                            <img src="/public/GOOGLE_GEMINI.png" alt="Google Gemini" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/GOOGLE.webp" alt="Google" class="max-w-full max-h-full object-contain">
+                            <img src="/public/GOOGLE.webp" alt="Google" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/SCALE_AI.png" alt="Scale AI" class="max-w-full max-h-full object-contain">
+                            <img src="/public/SCALE_AI.png" alt="Scale AI" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
                     <div class="flex space-x-12 items-center px-6">
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/CHATGPT.webp" alt="ChatGPT" class="max-w-full max-h-full object-contain">
+                            <img src="/public/CHATGPT.webp" alt="ChatGPT" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/GOOGLE_GEMINI.png" alt="Google Gemini" class="max-w-full max-h-full object-contain">
+                            <img src="/public/GOOGLE_GEMINI.png" alt="Google Gemini" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/GOOGLE.webp" alt="Google" class="max-w-full max-h-full object-contain">
+                            <img src="/public/GOOGLE.webp" alt="Google" class="max-w-full max-h-full object-contain">
                         </div>
                         <div class="flex-shrink-0 w-48 h-32 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl p-6 hover:bg-white/10 transition-all duration-300 hover:scale-110 border border-emerald-500/20">
-                            <img src="/SCALE_AI.png" alt="Scale AI" class="max-w-full max-h-full object-contain">
+                            <img src="/public/SCALE_AI.png" alt="Scale AI" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ $tiers = $stmt->fetchAll();
         <!-- Image Grid -->
         <div class="grid md:grid-cols-2 gap-8 mb-8">
             <div class="relative overflow-hidden rounded-3xl shadow-2xl group">
-                <img src="/6.jpg" alt="Business Partnership" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
+                <img src="/public/6.jpg" alt="Business Partnership" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <h3 class="text-white font-bold text-3xl mb-3 drop-shadow-lg">Trusted Partnerships</h3>
@@ -168,7 +168,7 @@ $tiers = $stmt->fetchAll();
                 </div>
             </div>
             <div class="relative overflow-hidden rounded-3xl shadow-2xl group">
-                <img src="/7.jpg" alt="Global Network" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
+                <img src="/public/7.jpg" alt="Global Network" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
                 <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/80 via-cyan-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <h3 class="text-white font-bold text-3xl mb-3 drop-shadow-lg">Global Network</h3>
@@ -179,7 +179,7 @@ $tiers = $stmt->fetchAll();
 
         <div class="grid md:grid-cols-2 gap-8">
             <div class="relative overflow-hidden rounded-3xl shadow-2xl group">
-                <img src="/8.jpg" alt="Advanced Technology" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
+                <img src="/public/8.jpg" alt="Advanced Technology" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
                 <div class="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <h3 class="text-white font-bold text-3xl mb-3 drop-shadow-lg">Cutting-Edge Platform</h3>
@@ -187,7 +187,7 @@ $tiers = $stmt->fetchAll();
                 </div>
             </div>
             <div class="relative overflow-hidden rounded-3xl shadow-2xl group">
-                <img src="/9.jpg" alt="Data Analytics" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
+                <img src="/public/9.jpg" alt="Data Analytics" class="w-full h-80 object-cover transform group-hover:scale-110 transition-all duration-700 ease-out">
                 <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <h3 class="text-white font-bold text-3xl mb-3 drop-shadow-lg">Smart Analytics</h3>
@@ -201,7 +201,7 @@ $tiers = $stmt->fetchAll();
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div class="grid md:grid-cols-3 gap-8">
             <div class="relative overflow-hidden rounded-2xl shadow-2xl group border border-emerald-500/20">
-                <img src="/2.jpg" alt="Professional Workspace" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <img src="/public/2.jpg" alt="Professional Workspace" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
                 <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-transparent flex items-end p-6">
                     <div>
                         <h3 class="text-white font-bold text-2xl mb-2 drop-shadow-lg">Simple Tasks</h3>
@@ -210,7 +210,7 @@ $tiers = $stmt->fetchAll();
                 </div>
             </div>
             <div class="relative overflow-hidden rounded-2xl shadow-2xl group border border-emerald-500/20">
-                <img src="/3.jpg" alt="Data Analysis" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <img src="/public/3.jpg" alt="Data Analysis" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
                 <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/80 via-cyan-900/40 to-transparent flex items-end p-6">
                     <div>
                         <h3 class="text-white font-bold text-2xl mb-2 drop-shadow-lg">Daily Earnings</h3>
@@ -219,7 +219,7 @@ $tiers = $stmt->fetchAll();
                 </div>
             </div>
             <div class="relative overflow-hidden rounded-2xl shadow-2xl group border border-emerald-500/20">
-                <img src="/4.jpg" alt="AI Technology" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <img src="/public/4.jpg" alt="AI Technology" class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
                 <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-transparent flex items-end p-6">
                     <div>
                         <h3 class="text-white font-bold text-2xl mb-2 drop-shadow-lg">VIP Levels</h3>
@@ -239,7 +239,7 @@ $tiers = $stmt->fetchAll();
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="order-2 lg:order-1">
-                    <img src="/1.jpg" alt="Big Data Processing" class="rounded-2xl shadow-2xl w-full hover:shadow-3xl hover:scale-105 transition-all duration-500 border border-emerald-500/30">
+                    <img src="/public/AI.jpg" alt="Big Data Processing" class="rounded-2xl shadow-2xl w-full hover:shadow-3xl hover:scale-105 transition-all duration-500 border border-emerald-500/30">
                 </div>
                 <div class="order-1 lg:order-2">
                     <h2 class="text-5xl md:text-6xl font-bold text-white mb-8 drop-shadow-lg">Start Earning Today</h2>
@@ -373,7 +373,7 @@ $tiers = $stmt->fetchAll();
             <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <div class="md:col-span-1">
                     <div class="flex items-center space-x-3 mb-6">
-                        <img src="/logo.jpg" alt="EarningsLLC Logo" class="w-14 h-14 rounded-lg object-cover shadow-lg">
+                        <img src="/public/logo.jpg" alt="EarningsLLC Logo" class="w-14 h-14 rounded-lg object-cover shadow-lg">
                         <span class="text-2xl font-bold">EarningsLLC</span>
                     </div>
                     <p class="text-gray-400 text-base mb-6 leading-relaxed">
