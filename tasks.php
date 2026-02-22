@@ -58,6 +58,7 @@ if (!$dailyEarnings) {
 
 // Find next incomplete task
 $currentTaskIndex = 0;
+$allTasksCompleted = true;
 foreach ($updatedTasks as $index => $task) {
     $isCompleted = false;
     foreach ($submissions as $submission) {
@@ -68,8 +69,15 @@ foreach ($updatedTasks as $index => $task) {
     }
     if (!$isCompleted) {
         $currentTaskIndex = $index;
+        $allTasksCompleted = false;
         break;
     }
+}
+
+// Check if user completed all 35 tasks
+$showCompletionPopup = false;
+if (count($submissions) >= 35 && count($updatedTasks) >= 35) {
+    $showCompletionPopup = true;
 }
 
 // Handle task submission
@@ -385,5 +393,57 @@ unset($_SESSION['show_preloader']);
         </div>
         <?php endif; ?>
     </div>
+
+    <?php if ($showCompletionPopup): ?>
+    <div id="completionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl max-w-lg w-full p-8 border-2 border-emerald-500/50 shadow-2xl animate-pulse-slow">
+            <div class="text-center">
+                <div class="mb-6">
+                    <svg class="w-20 h-20 text-emerald-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+
+                <h2 class="text-3xl font-bold text-white mb-4">Congratulations!</h2>
+
+                <p class="text-xl text-emerald-400 font-semibold mb-4">
+                    You've completed all 35 tasks!
+                </p>
+
+                <div class="bg-slate-700/50 rounded-2xl p-6 mb-6 border border-slate-600">
+                    <p class="text-gray-300 text-lg mb-4">
+                        To continue earning and access more tasks, please contact our support team on Telegram.
+                    </p>
+
+                    <div class="space-y-3">
+                        <a href="https://t.me/EARNINGSLLCONLINECS1" target="_blank" class="flex items-center justify-center space-x-3 text-white hover:text-emerald-400 transition-colors bg-slate-800/50 rounded-lg p-3 border border-slate-600 hover:border-emerald-500">
+                            <svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                            </svg>
+                            <span class="text-lg font-semibold">@EARNINGSLLCONLINECS1</span>
+                        </a>
+
+                        <div class="flex items-center justify-center space-x-3 text-gray-400">
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-sm">Support Available 24/7</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="closeCompletionModal()" class="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg text-lg">
+                    Continue to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeCompletionModal() {
+            document.getElementById('completionModal').style.display = 'none';
+        }
+    </script>
+    <?php endif; ?>
 </body>
 </html>
