@@ -194,6 +194,11 @@ switch ($action) {
         }
         break;
 
+    case 'set_preloader':
+        $_SESSION['show_preloader'] = true;
+        jsonResponse(['success' => true, 'message' => 'Preloader set']);
+        break;
+
     default:
         jsonResponse(['success' => false, 'message' => 'Invalid action'], 400);
 }

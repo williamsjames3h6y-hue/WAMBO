@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
-    redirect('login.php');
+    redirect('/login');
 }
 
 $auth = new Auth();
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
             }
 
             $_SESSION['show_preloader'] = true;
-            redirect('tasks.php');
+            redirect('/tasks');
         }
     }
 }
@@ -184,18 +184,66 @@ unset($_SESSION['show_preloader']);
     <?php if ($showPreloader): ?>
     <div id="preloader" class="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
         <div class="text-center">
-            <div class="relative w-24 h-24 mx-auto mb-6">
-                <div class="absolute inset-0 border-4 border-blue-500/30 rounded-full"></div>
-                <div class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+            <div class="relative w-40 h-40 mx-auto mb-8">
+                <div class="grid grid-cols-2 gap-3 w-full h-full">
+                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-1"></div>
+                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-2"></div>
+                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-3"></div>
+                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-4"></div>
+                </div>
             </div>
-            <p class="text-gray-900 text-2xl font-bold mb-2">Loading Next Task</p>
-            <p class="text-gray-600">Preparing your next product...</p>
+            <p class="text-gray-900 text-3xl font-bold mb-2 animate-pulse">Loading Tasks</p>
+            <p class="text-gray-600 text-lg">Preparing your workspace...</p>
         </div>
     </div>
+    <style>
+        @keyframes squareScale1 {
+            0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            20% { transform: scale(0.5) rotate(45deg); opacity: 0.5; }
+            40% { transform: scale(1) rotate(90deg); opacity: 1; }
+            60% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+            80% { transform: scale(1) rotate(270deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        @keyframes squareScale2 {
+            0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            20% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            40% { transform: scale(0.5) rotate(45deg); opacity: 0.5; }
+            60% { transform: scale(1) rotate(90deg); opacity: 1; }
+            80% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+            100% { transform: scale(1) rotate(270deg); opacity: 1; }
+        }
+        @keyframes squareScale3 {
+            0%, 20% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            40% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            60% { transform: scale(0.5) rotate(45deg); opacity: 0.5; }
+            80% { transform: scale(1) rotate(90deg); opacity: 1; }
+            100% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+        }
+        @keyframes squareScale4 {
+            0%, 40% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            60% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            80% { transform: scale(0.5) rotate(45deg); opacity: 0.5; }
+            100% { transform: scale(1) rotate(90deg); opacity: 1; }
+        }
+        .animate-square-1 { animation: squareScale1 2s ease-in-out forwards; }
+        .animate-square-2 { animation: squareScale2 2s ease-in-out forwards; }
+        .animate-square-3 { animation: squareScale3 2s ease-in-out forwards; }
+        .animate-square-4 { animation: squareScale4 2s ease-in-out forwards; }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
     <script>
         setTimeout(function() {
-            document.getElementById('preloader').style.display = 'none';
-        }, 3000);
+            const preloader = document.getElementById('preloader');
+            preloader.style.animation = 'fadeOut 0.5s ease-out forwards';
+            setTimeout(function() {
+                preloader.style.display = 'none';
+            }, 500);
+        }, 4000);
     </script>
     <?php endif; ?>
 
@@ -203,7 +251,7 @@ unset($_SESSION['show_preloader']);
     <header class="bg-slate-800/50 backdrop-blur-sm shadow-sm border-b border-slate-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-between items-center">
-                <a href="dashboard.php" class="flex items-center space-x-2 text-white hover:text-blue-400">
+                <a href="/dashboard" class="flex items-center space-x-2 text-white hover:text-blue-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
@@ -242,7 +290,7 @@ unset($_SESSION['show_preloader']);
             <p class="text-lg text-gray-200 mb-8">
                 Total Earnings: <span class="font-bold text-green-400">$<?php echo number_format($dailyEarnings['total_earnings'] ?? 0, 2); ?></span>
             </p>
-            <a href="dashboard.php" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
+            <a href="/dashboard" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
                 Back to Dashboard
             </a>
         </div>

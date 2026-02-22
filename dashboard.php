@@ -318,7 +318,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                         </p>
                     </div>
                 </div>
-                <a href="/tasks" class="w-full block bg-white text-blue-600 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl animate-slide-up" style="animation-delay: 0.4s;">
+                <a href="#" onclick="startTasks(event)" class="w-full block bg-white text-blue-600 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl animate-slide-up" style="animation-delay: 0.4s;">
                     Start Working on Tasks
                 </a>
 
@@ -341,7 +341,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                     </svg>
                     <span class="text-xs font-medium">Home</span>
                 </button>
-                <a href="/tasks" class="flex flex-col items-center text-gray-400 hover:text-white transition-all">
+                <a href="#" onclick="startTasks(event)" class="flex flex-col items-center text-gray-400 hover:text-white transition-all">
                     <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
@@ -427,6 +427,18 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
 
         function showPaymentMethods() {
             window.location.href = '/payment_methods';
+        }
+
+        function startTasks(event) {
+            event.preventDefault();
+            fetch('/api/tasks_handler.php?action=set_preloader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(() => {
+                window.location.href = '/tasks';
+            });
         }
 
         function showWalletChoice() {
