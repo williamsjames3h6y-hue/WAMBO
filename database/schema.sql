@@ -263,11 +263,11 @@ INSERT INTO vip_tiers (name, level, price_monthly, max_annotations_per_month, ma
 -- Insert Sample Brand Identification Tasks for VIP 1 (35 tasks)
 -- ============================================
 INSERT INTO admin_tasks (task_order, vip_level_required, image_url, brand_name, earning_amount) VALUES
-(1, 1, '/1.jpg', 'Brand 1', 2.25),
-(2, 1, '/2.jpg', 'Brand 2', 2.10),
-(3, 1, '/3.jpg', 'Brand 3', 2.30),
-(4, 1, '/4.jpg', 'Brand 4', 1.95),
-(5, 1, '/5.jpg', 'Brand 5', 2.40),
+(1, 1, '/public/products/P1.jpg', 'Nike', 2.25),
+(2, 1, '/public/products/P2.jpg', 'Apple', 2.10),
+(3, 1, '/public/products/P3.jpg', 'Samsung', 2.30),
+(4, 1, '/public/products/P4.jpg', 'Adidas', 1.95),
+(5, 1, '/public/products/P5.jpg', 'Sony', 2.40),
 (6, 1, '/6.jpg', 'Brand 6', 2.15),
 (7, 1, '/7.jpg', 'Brand 7', 2.05),
 (8, 1, '/8.jpg', 'Brand 8', 2.35),
