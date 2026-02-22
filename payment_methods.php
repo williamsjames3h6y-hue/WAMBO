@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
-    redirect('login.php');
+    redirect('/login');
 }
 
 $auth = new Auth();
@@ -19,6 +19,12 @@ $stmt = $db->prepare("SELECT * FROM payment_methods WHERE user_id = :user_id");
 $stmt->execute([':user_id' => $userId]);
 $paymentMethod = $stmt->fetch();
 
+// Decode account details if exists
+$accountDetails = null;
+if ($paymentMethod && !empty($paymentMethod['account_details'])) {
+    $accountDetails = json_decode($paymentMethod['account_details'], true);
+}
+
 $message = null;
 
 // Handle form submission
@@ -31,25 +37,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = ['type' => 'error', 'text' => 'Please fill in all fields'];
     } else {
         try {
+            // Create JSON object for account details
+            $details = json_encode([
+                'wallet' => $wallet,
+                'network' => $network,
+                'address' => $address
+            ]);
+
             if ($paymentMethod) {
                 // Update existing
-                $stmt = $db->prepare("UPDATE payment_methods SET wallet_address = :wallet, network = :network, address = :address, updated_at = NOW() WHERE user_id = :user_id");
+                $stmt = $db->prepare("UPDATE payment_methods SET method_type = 'crypto', account_details = :details, updated_at = NOW() WHERE user_id = :user_id");
                 $stmt->execute([
-                    ':wallet' => $wallet,
-                    ':network' => $network,
-                    ':address' => $address,
+                    ':details' => $details,
                     ':user_id' => $userId
                 ]);
             } else {
                 // Insert new
                 $paymentMethodId = generateUUID();
-                $stmt = $db->prepare("INSERT INTO payment_methods (id, user_id, wallet_address, network, address) VALUES (:id, :user_id, :wallet, :network, :address)");
+                $stmt = $db->prepare("INSERT INTO payment_methods (id, user_id, method_type, account_details, is_primary) VALUES (:id, :user_id, 'crypto', :details, TRUE)");
                 $stmt->execute([
                     ':id' => $paymentMethodId,
                     ':user_id' => $userId,
-                    ':wallet' => $wallet,
-                    ':network' => $network,
-                    ':address' => $address
+                    ':details' => $details
                 ]);
             }
 
@@ -59,8 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("SELECT * FROM payment_methods WHERE user_id = :user_id");
             $stmt->execute([':user_id' => $userId]);
             $paymentMethod = $stmt->fetch();
+
+            // Decode account details
+            if ($paymentMethod && !empty($paymentMethod['account_details'])) {
+                $accountDetails = json_decode($paymentMethod['account_details'], true);
+            }
         } catch (Exception $e) {
-            $message = ['type' => 'error', 'text' => 'Failed to update payment method'];
+            $message = ['type' => 'error', 'text' => 'Failed to update payment method: ' . $e->getMessage()];
         }
     }
 }
@@ -79,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header class="bg-slate-800/50 backdrop-blur-sm shadow-sm border-b border-slate-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center space-x-4">
-                <a href="dashboard.php" class="text-white p-2 hover:bg-slate-700 rounded-lg transition-all">
+                <a href="/dashboard" class="text-white p-2 hover:bg-slate-700 rounded-lg transition-all">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
@@ -130,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input
                         type="text"
                         name="wallet"
-                        value="<?php echo htmlspecialchars($paymentMethod['wallet_address'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($accountDetails['wallet'] ?? ''); ?>"
                         placeholder="Wallet"
                         class="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
@@ -143,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input
                         type="text"
                         name="network"
-                        value="<?php echo htmlspecialchars($paymentMethod['network'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($accountDetails['network'] ?? ''); ?>"
                         placeholder="Network"
                         class="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
@@ -156,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input
                         type="text"
                         name="address"
-                        value="<?php echo htmlspecialchars($paymentMethod['address'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($accountDetails['address'] ?? ''); ?>"
                         placeholder="Address"
                         class="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
@@ -172,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Current Payment Method Display -->
-        <?php if ($paymentMethod && !empty($paymentMethod['wallet_address'])): ?>
+        <?php if ($accountDetails && !empty($accountDetails['wallet'])): ?>
         <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 mt-6">
             <div class="flex items-center space-x-3 mb-4">
                 <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center">
@@ -189,15 +203,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="space-y-3 bg-slate-700/30 rounded-xl p-4">
                 <div>
                     <p class="text-gray-400 text-xs mb-1">Wallet</p>
-                    <p class="text-white font-mono text-sm break-all"><?php echo htmlspecialchars($paymentMethod['wallet_address']); ?></p>
+                    <p class="text-white font-mono text-sm break-all"><?php echo htmlspecialchars($accountDetails['wallet']); ?></p>
                 </div>
                 <div>
                     <p class="text-gray-400 text-xs mb-1">Network</p>
-                    <p class="text-white font-mono text-sm"><?php echo htmlspecialchars($paymentMethod['network']); ?></p>
+                    <p class="text-white font-mono text-sm"><?php echo htmlspecialchars($accountDetails['network']); ?></p>
                 </div>
                 <div>
                     <p class="text-gray-400 text-xs mb-1">Address</p>
-                    <p class="text-white font-mono text-sm break-all"><?php echo htmlspecialchars($paymentMethod['address']); ?></p>
+                    <p class="text-white font-mono text-sm break-all"><?php echo htmlspecialchars($accountDetails['address']); ?></p>
                 </div>
             </div>
         </div>
