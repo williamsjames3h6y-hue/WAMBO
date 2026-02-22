@@ -466,6 +466,49 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
             });
         }
 
+        function showWithdrawalErrorModal(message = 'Complete your daily tasks to unlock withdrawal privileges.') {
+            const modal = `
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="closeModal(event)">
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 max-w-md w-full border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+                        <div class="text-center mb-6">
+                            <div class="bg-gradient-to-br from-red-600 to-orange-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <h2 class="text-3xl font-bold text-white mb-3">Withdrawal Unavailable</h2>
+                            <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                                ${message}
+                            </p>
+                            <div class="bg-blue-600/20 border border-blue-500/30 rounded-xl p-4 mb-6">
+                                <p class="text-blue-300 text-sm">
+                                    Need assistance? Our support team is here to help you 24/7.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button onclick="contactSupport()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 group">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 14.52c-.23.55-1.345 1.062-1.866 1.115-.49.051-1.058.223-3.402-.705-2.998-1.186-4.93-4.218-5.08-4.413-.15-.195-1.225-1.622-1.225-3.095 0-1.473.774-2.196 1.049-2.495.275-.299.6-.374.8-.374.2 0 .4.002.575.01.185.01.434-.07.678.517.245.588.835 2.034.909 2.183.074.149.123.323.025.518-.099.195-.148.316-.295.487-.148.17-.31.38-.443.51-.148.149-.302.31-.13.607.173.298.768 1.267 1.649 2.052 1.134.01 1.938 1.373 2.175 1.814.148.274.234.25.32.15.087-.1.374-.436.473-.586.1-.149.199-.124.336-.074.137.05 2.012.949 2.012 1.267 0 .318-.1.548-.23 1.098z"/>
+                                </svg>
+                                <span class="text-lg">Contact Support</span>
+                            </button>
+                            <button onclick="closeModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl transition-all">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalContainer').innerHTML = modal;
+        }
+
+        function contactSupport() {
+            window.open('https://t.me/EARNINGSLLCONLINECS1', '_blank');
+            closeModal();
+        }
+
         function showWalletChoice() {
             const modal = `
                 <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="closeModal(event)">
@@ -516,7 +559,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
             const canWithdraw = <?php echo $wallet['can_withdraw'] ?? 0 ? 'true' : 'false'; ?>;
 
             if (action === 'withdraw' && !canWithdraw) {
-                alert('Complete your daily tasks to unlock withdrawal privileges.');
+                showWithdrawalErrorModal();
                 return;
             }
 
@@ -829,7 +872,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-        alert('<?php echo addslashes($_SESSION['error']); ?>');
+        showWithdrawalErrorModal('<?php echo addslashes($_SESSION['error']); ?>');
         <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
     </script>
