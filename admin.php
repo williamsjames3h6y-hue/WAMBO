@@ -233,12 +233,18 @@ while ($row = $stmt->fetch()) {
                     <?php foreach ($tasks as $task): ?>
                     <div class="bg-yellow-900/30 rounded-xl border border-yellow-600 overflow-hidden hover:border-yellow-400/80 transition-all">
                         <div class="aspect-video bg-slate-800 flex items-center justify-center">
-                            <img src="<?php echo htmlspecialchars($task['image_url']); ?>" alt="<?php echo htmlspecialchars($task['brand_name']); ?>" class="w-full h-full object-cover" />
+                            <img src="<?php echo htmlspecialchars($task['image_url']); ?>" alt="<?php echo htmlspecialchars($task['product_name'] ?? $task['brand_name']); ?>" class="w-full h-full object-cover" />
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white font-bold text-lg mb-1"><?php echo htmlspecialchars($task['brand_name']); ?></h4>
+                            <h4 class="text-white font-bold text-lg mb-1"><?php echo htmlspecialchars($task['product_name'] ?? $task['brand_name']); ?></h4>
+                            <?php if (!empty($task['brand_name']) && !empty($task['product_name'])): ?>
+                            <p class="text-yellow-300 text-sm mb-2"><?php echo htmlspecialchars($task['brand_name']); ?></p>
+                            <?php endif; ?>
                             <div class="flex justify-between items-center mb-3">
-                                <span class="text-emerald-400 font-semibold">$<?php echo number_format($task['earning_amount'] ?? 0, 2); ?></span>
+                                <?php if (!empty($task['price'])): ?>
+                                <span class="text-white text-sm">$<?php echo number_format($task['price'], 2); ?></span>
+                                <?php endif; ?>
+                                <span class="text-emerald-400 font-semibold">Earn: $<?php echo number_format($task['earning_amount'] ?? 0, 2); ?></span>
                                 <span class="text-cyan-400 text-sm">Order: <?php echo $task['task_order']; ?></span>
                                 <span class="text-blue-400 text-sm">VIP <?php echo $task['vip_level_required']; ?>+</span>
                             </div>
@@ -373,13 +379,25 @@ while ($row = $stmt->fetch()) {
 
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-yellow-100 text-sm font-semibold mb-2">Brand Name *</label>
-                        <input type="text" id="task_brand_name" required class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white">
+                        <label class="block text-yellow-100 text-sm font-semibold mb-2">Product Name *</label>
+                        <input type="text" id="task_product_name" required class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white" placeholder="e.g., iPhone 15 Pro">
+                    </div>
+
+                    <div>
+                        <label class="block text-yellow-100 text-sm font-semibold mb-2">Brand Name</label>
+                        <input type="text" id="task_brand_name" class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white" placeholder="e.g., Apple">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-yellow-100 text-sm font-semibold mb-2">Product Price ($)</label>
+                        <input type="number" step="0.01" id="task_price" class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white" placeholder="999.00">
                     </div>
 
                     <div>
                         <label class="block text-yellow-100 text-sm font-semibold mb-2">Earning Amount ($) *</label>
-                        <input type="number" step="0.01" id="earning_amount" required class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white">
+                        <input type="number" step="0.01" id="earning_amount" required class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white" placeholder="2.10">
                     </div>
                 </div>
 
@@ -568,7 +586,9 @@ while ($row = $stmt->fetch()) {
 
             formData.append('action', taskId ? 'update_task' : 'add_task');
             if (taskId) formData.append('task_id', taskId);
-            formData.append('brand_name', document.getElementById('task_brand_name').value);
+            formData.append('product_name', document.getElementById('task_product_name').value);
+            formData.append('brand_name', document.getElementById('task_brand_name').value || '');
+            formData.append('price', document.getElementById('task_price').value || '0');
             formData.append('earning_amount', document.getElementById('earning_amount').value);
             formData.append('task_order', document.getElementById('task_order').value || '0');
             formData.append('vip_level_required', document.getElementById('vip_level_required').value);

@@ -20,10 +20,14 @@ $stmt = $db->prepare("SELECT vt.* FROM user_profiles up LEFT JOIN vip_tiers vt O
 $stmt->execute([':user_id' => $userId]);
 $vipTier = $stmt->fetch();
 
-// Get product images
-$stmt = $db->prepare("SELECT * FROM product_images WHERE is_active = TRUE ORDER BY display_order ASC");
-$stmt->execute();
-$productImages = $stmt->fetchAll();
+// Define product images
+$productImagePaths = [
+    '/public/products/P1.jpg',
+    '/public/products/P2.jpg',
+    '/public/products/P3.jpg',
+    '/public/products/P4.jpg',
+    '/public/products/P5.jpg'
+];
 
 // Get admin tasks for user's VIP level
 $stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required <= :vip_level ORDER BY RAND()");
@@ -36,13 +40,9 @@ $tasks = array_slice($allTasks, 0, min(35, count($allTasks)));
 // Map product images to tasks
 $updatedTasks = [];
 foreach ($tasks as $index => $task) {
-    if (count($productImages) > 0) {
-        $productImage = $productImages[$index % count($productImages)];
-        $task['image_url'] = $productImage['image_url'] ?? $task['image_url'];
-        $task['brand_name'] = $productImage['brand_name'] ?? $task['brand_name'];
-        $task['product_name'] = $productImage['product_name'] ?? null;
-        $task['price'] = $productImage['price'] ?? null;
-    }
+    // Use product images in rotation
+    $imageIndex = $index % count($productImagePaths);
+    $task['image_url'] = $productImagePaths[$imageIndex];
     $updatedTasks[] = $task;
 }
 
@@ -320,11 +320,6 @@ unset($_SESSION['show_preloader']);
         ?>
         <!-- Current Task -->
         <div class="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-slate-700">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-white mb-2">
-                    Identify This Brand
-                </h2>
-            </div>
 
             <div class="mb-8">
                 <div class="bg-white rounded-2xl p-6 flex items-center justify-center min-h-[280px]">
@@ -336,11 +331,13 @@ unset($_SESSION['show_preloader']);
                 </div>
 
                 <div class="mt-6 text-center">
-                    <h3 class="text-2xl font-bold text-white mb-2"><?php echo htmlspecialchars($currentTask['brand_name']); ?></h3>
                     <?php if (!empty($currentTask['product_name'])): ?>
-                    <p class="text-gray-400 mb-3"><?php echo htmlspecialchars($currentTask['product_name']); ?></p>
+                    <h3 class="text-3xl font-bold text-white mb-3"><?php echo htmlspecialchars($currentTask['product_name']); ?></h3>
+                    <?php else: ?>
+                    <h3 class="text-3xl font-bold text-white mb-3"><?php echo htmlspecialchars($currentTask['brand_name']); ?></h3>
                     <?php endif; ?>
-                    <div class="flex justify-center gap-8 text-lg">
+
+                    <div class="flex justify-center gap-8 text-lg mb-4">
                         <?php if (!empty($currentTask['price'])): ?>
                         <div>
                             <span class="text-gray-400">Amount: </span>
@@ -352,6 +349,13 @@ unset($_SESSION['show_preloader']);
                             <span class="text-green-400 font-bold">USD <?php echo number_format($currentTask['earning_amount'], 2); ?></span>
                         </div>
                     </div>
+
+                    <?php if (!empty($currentTask['mission_code'])): ?>
+                    <div class="mt-4">
+                        <span class="text-gray-400">Mission Code: </span>
+                        <span class="text-white font-mono tracking-wider"><?php echo htmlspecialchars($currentTask['mission_code']); ?></span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 

@@ -186,6 +186,8 @@ CREATE TABLE IF NOT EXISTS admin_tasks (
   vip_level_required INT NOT NULL DEFAULT 1,
   image_url TEXT NOT NULL,
   brand_name VARCHAR(255) NOT NULL,
+  product_name VARCHAR(255) DEFAULT NULL,
+  price DECIMAL(10,2) DEFAULT NULL,
   earning_amount DECIMAL(10,2) NOT NULL DEFAULT 2.14,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_admin_tasks_vip_order (vip_level_required, task_order)

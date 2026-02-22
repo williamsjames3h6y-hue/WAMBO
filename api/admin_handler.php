@@ -23,26 +23,45 @@ if (!$isAdmin) {
 $database = new Database();
 $db = $database->getConnection();
 
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
+// Get action from request
+$requestMethod = $_SERVER['REQUEST_METHOD'];
+$action = '';
+
+if ($requestMethod === 'POST') {
+    $action = $_POST['action'] ?? '';
+} else {
+    $action = $_GET['action'] ?? '';
+}
+
+// Log for debugging
+error_log("Admin Handler - Action: " . $action . ", Method: " . $requestMethod);
+
+if (empty($action)) {
+    throw new Exception('No action specified');
+}
 
 try {
     switch ($action) {
         case 'add_task':
+            $productName = sanitizeInput($_POST['product_name'] ?? '');
             $brandName = sanitizeInput($_POST['brand_name'] ?? '');
+            $price = floatval($_POST['price'] ?? 0);
             $earningAmount = floatval($_POST['earning_amount'] ?? 0);
             $imageUrl = sanitizeInput($_POST['image_url'] ?? '');
             $taskOrder = intval($_POST['task_order'] ?? 0);
             $vipLevelRequired = intval($_POST['vip_level_required'] ?? 1);
 
-            if (empty($brandName) || empty($imageUrl)) {
-                throw new Exception('Brand name and image URL are required');
+            if (empty($productName) || empty($imageUrl)) {
+                throw new Exception('Product name and image URL are required');
             }
 
             $taskId = generateUUID();
-            $stmt = $db->prepare("INSERT INTO admin_tasks (id, brand_name, earning_amount, image_url, task_order, vip_level_required) VALUES (:id, :brand_name, :earning_amount, :image_url, :task_order, :vip_level_required)");
+            $stmt = $db->prepare("INSERT INTO admin_tasks (id, product_name, brand_name, price, earning_amount, image_url, task_order, vip_level_required) VALUES (:id, :product_name, :brand_name, :price, :earning_amount, :image_url, :task_order, :vip_level_required)");
             $stmt->execute([
                 ':id' => $taskId,
+                ':product_name' => $productName,
                 ':brand_name' => $brandName,
+                ':price' => $price > 0 ? $price : null,
                 ':earning_amount' => $earningAmount,
                 ':image_url' => $imageUrl,
                 ':task_order' => $taskOrder,
@@ -54,7 +73,9 @@ try {
 
         case 'update_task':
             $taskId = sanitizeInput($_POST['task_id'] ?? '');
+            $productName = sanitizeInput($_POST['product_name'] ?? '');
             $brandName = sanitizeInput($_POST['brand_name'] ?? '');
+            $price = floatval($_POST['price'] ?? 0);
             $earningAmount = floatval($_POST['earning_amount'] ?? 0);
             $imageUrl = sanitizeInput($_POST['image_url'] ?? '');
             $taskOrder = intval($_POST['task_order'] ?? 0);
@@ -64,10 +85,12 @@ try {
                 throw new Exception('Task ID is required');
             }
 
-            $stmt = $db->prepare("UPDATE admin_tasks SET brand_name = :brand_name, earning_amount = :earning_amount, image_url = :image_url, task_order = :task_order, vip_level_required = :vip_level_required WHERE id = :id");
+            $stmt = $db->prepare("UPDATE admin_tasks SET product_name = :product_name, brand_name = :brand_name, price = :price, earning_amount = :earning_amount, image_url = :image_url, task_order = :task_order, vip_level_required = :vip_level_required WHERE id = :id");
             $stmt->execute([
                 ':id' => $taskId,
+                ':product_name' => $productName,
                 ':brand_name' => $brandName,
+                ':price' => $price > 0 ? $price : null,
                 ':earning_amount' => $earningAmount,
                 ':image_url' => $imageUrl,
                 ':task_order' => $taskOrder,
@@ -184,8 +207,6 @@ try {
                 throw new Exception('Settings type is required');
             }
 
-            $db->beginTransaction();
-
             if ($settingsType === 'site_info') {
                 $settings = [
                     'site_name' => sanitizeInput($_POST['site_name'] ?? ''),
@@ -212,20 +233,32 @@ try {
                 throw new Exception('Invalid settings type');
             }
 
-            $stmt = $db->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (:key, :value) ON DUPLICATE KEY UPDATE setting_value = :value");
-
             foreach ($settings as $key => $value) {
-                $stmt->execute([':key' => $key, ':value' => $value]);
+                // Check if setting exists
+                $stmt = $db->prepare("SELECT setting_key FROM site_settings WHERE setting_key = :key");
+                $stmt->execute([':key' => $key]);
+                $exists = $stmt->fetch();
+
+                if ($exists) {
+                    // Update existing setting
+                    $stmt = $db->prepare("UPDATE site_settings SET setting_value = :value WHERE setting_key = :key");
+                    $stmt->execute([':key' => $key, ':value' => $value]);
+                } else {
+                    // Insert new setting
+                    $stmt = $db->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (:key, :value)");
+                    $stmt->execute([':key' => $key, ':value' => $value]);
+                }
             }
 
-            $db->commit();
             echo json_encode(['success' => true, 'message' => 'Settings updated successfully']);
             break;
 
         default:
-            throw new Exception('Invalid action');
+            throw new Exception('Invalid action: ' . $action);
     }
 } catch (Exception $e) {
+    error_log("Admin Handler Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(400);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => $e->getMessage(), 'action_received' => $action]);
 }
