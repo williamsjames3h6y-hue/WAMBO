@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   subscription_status VARCHAR(50) DEFAULT 'active',
   subscription_ends_at TIMESTAMP NULL,
   annotations_this_month INT DEFAULT 0,
+  withdrawal_password_hash VARCHAR(255) DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
