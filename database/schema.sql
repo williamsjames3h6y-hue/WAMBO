@@ -297,3 +297,47 @@ INSERT INTO admin_tasks (task_order, vip_level_required, image_url, brand_name, 
 (33, 1, '/6.jpg', 'Brand 33', 2.30),
 (34, 1, '/7.jpg', 'Brand 34', 2.15),
 (35, 1, '/8.jpg', 'Brand 35', 2.05);
+
+-- ============================================
+-- Table: product_images
+-- ============================================
+CREATE TABLE IF NOT EXISTS product_images (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  image_url TEXT NOT NULL,
+  brand_name VARCHAR(255) NOT NULL,
+  product_name VARCHAR(255) DEFAULT NULL,
+  price DECIMAL(10,2) DEFAULT NULL,
+  display_order INT NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_product_images_active_order (is_active, display_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Insert Sample Product Images
+-- ============================================
+INSERT INTO product_images (image_url, brand_name, product_name, price, display_order, is_active) VALUES
+('/products/P1.jpg', 'Premium Brand A', 'Luxury Product 1', 125.99, 1, TRUE),
+('/products/P2.jpg', 'Premium Brand B', 'Luxury Product 2', 149.99, 2, TRUE),
+('/products/P3.jpg', 'Premium Brand C', 'Luxury Product 3', 99.99, 3, TRUE),
+('/products/P4.jpg', 'Premium Brand D', 'Luxury Product 4', 179.99, 4, TRUE),
+('/products/P5.jpg', 'Premium Brand E', 'Luxury Product 5', 134.99, 5, TRUE),
+('/1.jpg', 'Brand Alpha', 'Product Alpha', 89.99, 6, TRUE),
+('/2.jpg', 'Brand Beta', 'Product Beta', 115.99, 7, TRUE),
+('/3.jpg', 'Brand Gamma', 'Product Gamma', 129.99, 8, TRUE),
+('/4.jpg', 'Brand Delta', 'Product Delta', 94.99, 9, TRUE),
+('/5.jpg', 'Brand Epsilon', 'Product Epsilon', 159.99, 10, TRUE),
+('/6.jpg', 'Brand Zeta', 'Product Zeta', 109.99, 11, TRUE),
+('/7.jpg', 'Brand Eta', 'Product Eta', 139.99, 12, TRUE),
+('/8.jpg', 'Brand Theta', 'Product Theta', 119.99, 13, TRUE),
+('/9.jpg', 'Brand Iota', 'Product Iota', 144.99, 14, TRUE),
+('/AI.jpg', 'TechBrand AI', 'AI Assistant Pro', 199.99, 15, TRUE),
+('/AI2.jpg', 'TechBrand AI+', 'AI Companion Plus', 249.99, 16, TRUE),
+('/AI3.jpg', 'TechBrand Intelligence', 'Smart AI Device', 179.99, 17, TRUE),
+('/AI4.jpg', 'TechBrand Neural', 'Neural Processor', 299.99, 18, TRUE),
+('/AI5.jpg', 'TechBrand Quantum', 'Quantum AI Core', 399.99, 19, TRUE),
+('/CHATGPT.webp', 'OpenAI', 'ChatGPT Premium', 20.00, 20, TRUE),
+('/GOOGLE_GEMINI.png', 'Google', 'Gemini Advanced', 19.99, 21, TRUE),
+('/GOOGLE.webp', 'Google Cloud', 'Cloud AI Services', 299.99, 22, TRUE),
+('/SCALE_AI.png', 'Scale AI', 'Enterprise Solution', 999.99, 23, TRUE);
