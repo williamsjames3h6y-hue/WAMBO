@@ -27,77 +27,67 @@ $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 try {
     switch ($action) {
-        case 'add_product':
+        case 'add_task':
             $brandName = sanitizeInput($_POST['brand_name'] ?? '');
-            $productName = sanitizeInput($_POST['product_name'] ?? '');
-            $description = sanitizeInput($_POST['description'] ?? '');
-            $price = floatval($_POST['price'] ?? 0);
-            $commission = floatval($_POST['commission'] ?? 0);
+            $earningAmount = floatval($_POST['earning_amount'] ?? 0);
             $imageUrl = sanitizeInput($_POST['image_url'] ?? '');
-            $displayOrder = intval($_POST['display_order'] ?? 0);
+            $taskOrder = intval($_POST['task_order'] ?? 0);
+            $vipLevelRequired = intval($_POST['vip_level_required'] ?? 1);
 
             if (empty($brandName) || empty($imageUrl)) {
                 throw new Exception('Brand name and image URL are required');
             }
 
-            $productId = generateUUID();
-            $stmt = $db->prepare("INSERT INTO product_images (id, brand_name, product_name, description, price, commission, image_url, display_order, is_active) VALUES (:id, :brand_name, :product_name, :description, :price, :commission, :image_url, :display_order, TRUE)");
+            $taskId = generateUUID();
+            $stmt = $db->prepare("INSERT INTO admin_tasks (id, brand_name, earning_amount, image_url, task_order, vip_level_required) VALUES (:id, :brand_name, :earning_amount, :image_url, :task_order, :vip_level_required)");
             $stmt->execute([
-                ':id' => $productId,
+                ':id' => $taskId,
                 ':brand_name' => $brandName,
-                ':product_name' => $productName,
-                ':description' => $description,
-                ':price' => $price,
-                ':commission' => $commission,
+                ':earning_amount' => $earningAmount,
                 ':image_url' => $imageUrl,
-                ':display_order' => $displayOrder
+                ':task_order' => $taskOrder,
+                ':vip_level_required' => $vipLevelRequired
             ]);
 
-            echo json_encode(['success' => true, 'message' => 'Product added successfully', 'product_id' => $productId]);
+            echo json_encode(['success' => true, 'message' => 'Task added successfully', 'task_id' => $taskId]);
             break;
 
-        case 'update_product':
-            $productId = sanitizeInput($_POST['product_id'] ?? '');
+        case 'update_task':
+            $taskId = sanitizeInput($_POST['task_id'] ?? '');
             $brandName = sanitizeInput($_POST['brand_name'] ?? '');
-            $productName = sanitizeInput($_POST['product_name'] ?? '');
-            $description = sanitizeInput($_POST['description'] ?? '');
-            $price = floatval($_POST['price'] ?? 0);
-            $commission = floatval($_POST['commission'] ?? 0);
+            $earningAmount = floatval($_POST['earning_amount'] ?? 0);
             $imageUrl = sanitizeInput($_POST['image_url'] ?? '');
-            $displayOrder = intval($_POST['display_order'] ?? 0);
-            $isActive = isset($_POST['is_active']) ? (bool)$_POST['is_active'] : true;
+            $taskOrder = intval($_POST['task_order'] ?? 0);
+            $vipLevelRequired = intval($_POST['vip_level_required'] ?? 1);
 
-            if (empty($productId)) {
-                throw new Exception('Product ID is required');
+            if (empty($taskId)) {
+                throw new Exception('Task ID is required');
             }
 
-            $stmt = $db->prepare("UPDATE product_images SET brand_name = :brand_name, product_name = :product_name, description = :description, price = :price, commission = :commission, image_url = :image_url, display_order = :display_order, is_active = :is_active WHERE id = :id");
+            $stmt = $db->prepare("UPDATE admin_tasks SET brand_name = :brand_name, earning_amount = :earning_amount, image_url = :image_url, task_order = :task_order, vip_level_required = :vip_level_required WHERE id = :id");
             $stmt->execute([
-                ':id' => $productId,
+                ':id' => $taskId,
                 ':brand_name' => $brandName,
-                ':product_name' => $productName,
-                ':description' => $description,
-                ':price' => $price,
-                ':commission' => $commission,
+                ':earning_amount' => $earningAmount,
                 ':image_url' => $imageUrl,
-                ':display_order' => $displayOrder,
-                ':is_active' => $isActive
+                ':task_order' => $taskOrder,
+                ':vip_level_required' => $vipLevelRequired
             ]);
 
-            echo json_encode(['success' => true, 'message' => 'Product updated successfully']);
+            echo json_encode(['success' => true, 'message' => 'Task updated successfully']);
             break;
 
-        case 'delete_product':
-            $productId = sanitizeInput($_POST['product_id'] ?? '');
+        case 'delete_task':
+            $taskId = sanitizeInput($_POST['task_id'] ?? '');
 
-            if (empty($productId)) {
-                throw new Exception('Product ID is required');
+            if (empty($taskId)) {
+                throw new Exception('Task ID is required');
             }
 
-            $stmt = $db->prepare("DELETE FROM product_images WHERE id = :id");
-            $stmt->execute([':id' => $productId]);
+            $stmt = $db->prepare("DELETE FROM admin_tasks WHERE id = :id");
+            $stmt->execute([':id' => $taskId]);
 
-            echo json_encode(['success' => true, 'message' => 'Product deleted successfully']);
+            echo json_encode(['success' => true, 'message' => 'Task deleted successfully']);
             break;
 
         case 'update_user_balance':
@@ -187,18 +177,49 @@ try {
             echo json_encode(['success' => true, 'user' => $user]);
             break;
 
-        case 'update_site_settings':
-            $settingKey = sanitizeInput($_POST['setting_key'] ?? '');
-            $settingValue = sanitizeInput($_POST['setting_value'] ?? '');
+        case 'update_settings':
+            $settingsType = sanitizeInput($_POST['settings_type'] ?? '');
 
-            if (empty($settingKey)) {
-                throw new Exception('Setting key is required');
+            if (empty($settingsType)) {
+                throw new Exception('Settings type is required');
+            }
+
+            $db->beginTransaction();
+
+            if ($settingsType === 'site_info') {
+                $settings = [
+                    'site_name' => sanitizeInput($_POST['site_name'] ?? ''),
+                    'site_description' => sanitizeInput($_POST['site_description'] ?? ''),
+                    'support_email' => sanitizeInput($_POST['support_email'] ?? '')
+                ];
+            } elseif ($settingsType === 'payment') {
+                $settings = [
+                    'min_withdrawal' => sanitizeInput($_POST['min_withdrawal'] ?? ''),
+                    'processing_fee' => sanitizeInput($_POST['processing_fee'] ?? ''),
+                    'withdrawal_days' => sanitizeInput($_POST['withdrawal_days'] ?? '')
+                ];
+            } elseif ($settingsType === 'referral') {
+                $settings = [
+                    'referral_bonus' => sanitizeInput($_POST['referral_bonus'] ?? ''),
+                    'referral_commission' => sanitizeInput($_POST['referral_commission'] ?? '')
+                ];
+            } elseif ($settingsType === 'task') {
+                $settings = [
+                    'default_task_earnings' => sanitizeInput($_POST['default_task_earnings'] ?? ''),
+                    'task_review_required' => sanitizeInput($_POST['task_review_required'] ?? '')
+                ];
+            } else {
+                throw new Exception('Invalid settings type');
             }
 
             $stmt = $db->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (:key, :value) ON DUPLICATE KEY UPDATE setting_value = :value");
-            $stmt->execute([':key' => $settingKey, ':value' => $settingValue]);
 
-            echo json_encode(['success' => true, 'message' => 'Setting updated successfully']);
+            foreach ($settings as $key => $value) {
+                $stmt->execute([':key' => $key, ':value' => $value]);
+            }
+
+            $db->commit();
+            echo json_encode(['success' => true, 'message' => 'Settings updated successfully']);
             break;
 
         default:

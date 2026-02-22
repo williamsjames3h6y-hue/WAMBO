@@ -341,3 +341,28 @@ INSERT INTO product_images (image_url, brand_name, product_name, price, display_
 ('/GOOGLE_GEMINI.png', 'Google', 'Gemini Advanced', 19.99, 21, TRUE),
 ('/GOOGLE.webp', 'Google Cloud', 'Cloud AI Services', 299.99, 22, TRUE),
 ('/SCALE_AI.png', 'Scale AI', 'Enterprise Solution', 999.99, 23, TRUE);
+
+-- ============================================
+-- Table: site_settings
+-- ============================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  setting_key VARCHAR(100) PRIMARY KEY,
+  setting_value TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Insert Default Site Settings
+-- ============================================
+INSERT INTO site_settings (setting_key, setting_value) VALUES
+('site_name', 'EarningsLLC'),
+('site_description', 'Earn money by completing simple tasks'),
+('support_email', 'support@earningsllc.com'),
+('min_withdrawal', '10.00'),
+('processing_fee', '2.00'),
+('withdrawal_days', 'Monday,Friday'),
+('referral_bonus', '5.00'),
+('referral_commission', '10.00'),
+('default_task_earnings', '2.25'),
+('task_review_required', '0');
