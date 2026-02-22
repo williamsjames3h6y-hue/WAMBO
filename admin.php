@@ -402,13 +402,35 @@ while ($row = $stmt->fetch()) {
                 </div>
 
                 <div>
-                    <label class="block text-yellow-100 text-sm font-semibold mb-2">Image URL *</label>
-                    <input type="text" id="task_image_url" required placeholder="/public/AI.jpg" class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white">
-                    <p class="text-yellow-300 text-xs mt-1">Use paths like: /public/AI.jpg or /public/products/P1.jpg</p>
+                    <label class="block text-yellow-100 text-sm font-semibold mb-2">Image *</label>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <label class="flex-1 cursor-pointer">
+                                <div class="bg-yellow-800/50 border-2 border-dashed border-yellow-600 rounded-lg px-4 py-3 text-center hover:bg-yellow-800/70 transition-all">
+                                    <svg class="w-8 h-8 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="text-yellow-200 text-sm font-medium">Click to Upload Image</span>
+                                    <p class="text-yellow-300 text-xs mt-1">JPG, PNG, GIF, WEBP (Max 5MB)</p>
+                                </div>
+                                <input type="file" id="task_image_file" accept="image/*" class="hidden" onchange="uploadTaskImage()">
+                            </label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-yellow-300 text-sm">OR</span>
+                        </div>
+                        <div>
+                            <input type="text" id="task_image_url" placeholder="/public/AI.jpg or https://..." class="w-full bg-yellow-800/50 border border-yellow-600 rounded-lg px-4 py-2 text-white">
+                            <p class="text-yellow-300 text-xs mt-1">Enter image URL manually</p>
+                        </div>
+                        <div id="imagePreview" class="hidden">
+                            <img id="previewImg" class="w-full h-32 object-cover rounded-lg border-2 border-yellow-600" />
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex space-x-3 pt-4">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-bold py-3 rounded-lg transition-all">Save Task</button>
+                    <button type="submit" id="saveTaskBtn" class="flex-1 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-bold py-3 rounded-lg transition-all">Save Task</button>
                     <button type="button" onclick="closeTaskModal()" class="flex-1 bg-yellow-700 hover:bg-yellow-600 text-white font-bold py-3 rounded-lg transition-all">Cancel</button>
                 </div>
             </form>
@@ -493,10 +515,53 @@ while ($row = $stmt->fetch()) {
 
         function closeTaskModal() {
             document.getElementById('taskModal').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        async function uploadTaskImage() {
+            const fileInput = document.getElementById('task_image_file');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            const saveBtn = document.getElementById('saveTaskBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Uploading Image...';
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/api/upload_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('task_image_url').value = data.image_url;
+                    document.getElementById('previewImg').src = data.image_url;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    alert('Image uploaded successfully!');
+                } else {
+                    alert('Upload failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Upload error: ' + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Task';
+            }
         }
 
         document.getElementById('taskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const imageUrl = document.getElementById('task_image_url').value;
+            if (!imageUrl) {
+                alert('Please upload an image or provide an image URL');
+                return;
+            }
 
             const taskId = document.getElementById('task_id').value;
             const formData = new FormData();
@@ -505,21 +570,25 @@ while ($row = $stmt->fetch()) {
             if (taskId) formData.append('task_id', taskId);
             formData.append('brand_name', document.getElementById('task_brand_name').value);
             formData.append('earning_amount', document.getElementById('earning_amount').value);
-            formData.append('task_order', document.getElementById('task_order').value);
+            formData.append('task_order', document.getElementById('task_order').value || '0');
             formData.append('vip_level_required', document.getElementById('vip_level_required').value);
-            formData.append('image_url', document.getElementById('task_image_url').value);
+            formData.append('image_url', imageUrl);
 
-            const response = await fetch('/api/admin_handler.php', {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const response = await fetch('/api/admin_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const data = await response.json();
-            if (data.success) {
-                alert(taskId ? 'Task updated successfully!' : 'Task added successfully!');
-                location.reload();
-            } else {
-                alert('Error: ' + data.error);
+                const data = await response.json();
+                if (data.success) {
+                    alert(taskId ? 'Task updated successfully!' : 'Task added successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
             }
         });
 

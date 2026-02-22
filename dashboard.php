@@ -237,14 +237,14 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                 <span class="text-white text-xs font-medium text-center">Customer Care</span>
             </button>
 
-            <button class="flex flex-col items-center justify-center bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700 hover:bg-slate-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300 animate-slide-up" style="animation-delay: 0.2s;">
+            <a href="/certificate" class="flex flex-col items-center justify-center bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700 hover:bg-slate-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300 animate-slide-up" style="animation-delay: 0.2s;">
                 <div class="w-12 h-12 rounded-full bg-violet-600 flex items-center justify-center mb-2">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                     </svg>
                 </div>
                 <span class="text-white text-xs font-medium text-center">Certificate</span>
-            </button>
+            </a>
 
             <button onclick="showPaymentMethods()" class="flex flex-col items-center justify-center bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700 hover:bg-slate-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300 animate-slide-up" style="animation-delay: 0.25s;">
                 <div class="w-12 h-12 rounded-full bg-cyan-600 flex items-center justify-center mb-2">
@@ -272,15 +272,6 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                 </div>
                 <span class="text-white text-xs font-medium text-center">About Us</span>
             </button>
-
-            <a href="/certificate" class="flex flex-col items-center justify-center bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700 hover:bg-slate-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300 animate-slide-up" style="animation-delay: 0.4s;">
-                <div class="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                </div>
-                <span class="text-white text-xs font-medium text-center">Certificate</span>
-            </a>
         </div>
 
         <!-- Membership Level -->

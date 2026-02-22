@@ -26,18 +26,23 @@ $stmt->execute();
 $productImages = $stmt->fetchAll();
 
 // Get admin tasks for user's VIP level
-$stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required = :vip_level ORDER BY task_order ASC");
+$stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required <= :vip_level ORDER BY RAND()");
 $stmt->execute([':vip_level' => $vipTier['level']]);
-$tasks = $stmt->fetchAll();
+$allTasks = $stmt->fetchAll();
+
+// Limit to 35 tasks randomly
+$tasks = array_slice($allTasks, 0, min(35, count($allTasks)));
 
 // Map product images to tasks
 $updatedTasks = [];
 foreach ($tasks as $index => $task) {
-    $productImage = $productImages[$index % count($productImages)];
-    $task['image_url'] = $productImage['image_url'] ?? $task['image_url'];
-    $task['brand_name'] = $productImage['brand_name'] ?? $task['brand_name'];
-    $task['product_name'] = $productImage['product_name'] ?? null;
-    $task['price'] = $productImage['price'] ?? null;
+    if (count($productImages) > 0) {
+        $productImage = $productImages[$index % count($productImages)];
+        $task['image_url'] = $productImage['image_url'] ?? $task['image_url'];
+        $task['brand_name'] = $productImage['brand_name'] ?? $task['brand_name'];
+        $task['product_name'] = $productImage['product_name'] ?? null;
+        $task['price'] = $productImage['price'] ?? null;
+    }
     $updatedTasks[] = $task;
 }
 
@@ -137,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
                 ':user_id' => $userId,
                 ':wallet_id' => $wallet['id'],
                 ':amount' => $currentTask['earning_amount'],
-                ':description' => "Brand identification task #{$currentTask['task_order']} completed"
+                ':description' => "Brand identification task completed"
             ]);
 
             // Update daily earnings
@@ -317,7 +322,7 @@ unset($_SESSION['show_preloader']);
         <div class="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-slate-700">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-white mb-2">
-                    Task <?php echo $currentTask['task_order']; ?>
+                    Identify This Brand
                 </h2>
             </div>
 
