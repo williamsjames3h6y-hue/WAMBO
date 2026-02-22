@@ -3,7 +3,7 @@ require_once __DIR__ . '/config/config.php';
 
 // If already logged in, redirect to dashboard
 if (isLoggedIn()) {
-    redirect('dashboard.php');
+    redirect('/dashboard');
 }
 
 $error = '';
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Auto-login after registration
             $loginResult = $auth->login($email, $password);
             if ($loginResult['success']) {
-                redirect('dashboard.php');
+                redirect('/dashboard');
             }
         } else {
             $error = $result['message'];
@@ -131,12 +131,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </button>
                 </form>
 
-                <div class="mt-6 text-center">
+                <div class="mt-6 text-center space-y-3">
                     <a
-                        href="login.php"
-                        class="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                        href="/login"
+                        class="block text-blue-600 hover:text-blue-700 font-medium transition-colors"
                     >
                         Already have an account? Sign in
+                    </a>
+                    <a
+                        href="https://t.me/EARNINGSLLCONLINECS1"
+                        target="_blank"
+                        class="flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                    >
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Need help? Contact Support
                     </a>
                 </div>
             </div>

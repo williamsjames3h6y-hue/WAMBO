@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
-    redirect('login.php');
+    redirect('/login');
 }
 
 $auth = new Auth();
@@ -139,14 +139,14 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
     <!-- Menu Dropdown -->
     <div id="menuDropdown" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" onclick="toggleMenu()">
         <div class="absolute right-0 top-16 bg-slate-800 rounded-lg shadow-2xl m-4 p-4 min-w-[200px]" onclick="event.stopPropagation()">
-            <a href="logout.php" class="w-full flex items-center space-x-2 text-white hover:bg-slate-700 p-3 rounded-lg transition-all">
+            <a href="/logout" class="w-full flex items-center space-x-2 text-white hover:bg-slate-700 p-3 rounded-lg transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
                 <span>Logout</span>
             </a>
             <?php if ($isAdmin): ?>
-            <a href="admin.php" class="w-full flex items-center space-x-2 text-white hover:bg-slate-700 p-3 rounded-lg transition-all mt-2">
+            <a href="/admin" class="w-full flex items-center space-x-2 text-white hover:bg-slate-700 p-3 rounded-lg transition-all mt-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                 </svg>
@@ -318,7 +318,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                         </p>
                     </div>
                 </div>
-                <a href="tasks.php" class="w-full block bg-white text-blue-600 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl animate-slide-up" style="animation-delay: 0.4s;">
+                <a href="/tasks" class="w-full block bg-white text-blue-600 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl animate-slide-up" style="animation-delay: 0.4s;">
                     Start Working on Tasks
                 </a>
 
@@ -341,7 +341,7 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                     </svg>
                     <span class="text-xs font-medium">Home</span>
                 </button>
-                <a href="tasks.php" class="flex flex-col items-center text-gray-400 hover:text-white transition-all">
+                <a href="/tasks" class="flex flex-col items-center text-gray-400 hover:text-white transition-all">
                     <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
@@ -422,11 +422,11 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
         }
 
         function showCustomerSupport() {
-            alert('Customer Support\\n\\nEmail: support@earningsllc.com\\nPhone: +1 (555) 123-4567\\n\\nOur team is available 24/7 to assist you.');
+            window.open('https://t.me/EARNINGSLLCONLINECS1', '_blank');
         }
 
         function showPaymentMethods() {
-            window.location.href = 'payment_methods.php';
+            window.location.href = '/payment_methods';
         }
 
         function showWalletChoice() {
