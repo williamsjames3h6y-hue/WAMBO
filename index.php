@@ -59,18 +59,18 @@ $tiers = $stmt->fetchAll();
     <!-- Header -->
     <header class="bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-40 border-b border-emerald-500/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-3 group">
-                    <img src="/public/logo.jpg" alt="EarningsLLC Logo" class="w-12 h-12 rounded-lg object-cover shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center space-x-2 sm:space-x-3 group">
+                    <img src="/public/logo.jpg" alt="EarningsLLC Logo" class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-lg sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent whitespace-nowrap">
                         EarningsLLC
                     </span>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <a href="login.php" class="bg-slate-800 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-emerald-500/30 hover:border-emerald-500 hover:scale-105">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <a href="login.php" class="bg-slate-800 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold hover:bg-slate-700 transition-all border border-emerald-500/30 hover:border-emerald-500 hover:scale-105 text-sm sm:text-base">
                         Log in
                     </a>
-                    <a href="register.php" class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:from-emerald-500 hover:to-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/50 hover:scale-105">
+                    <a href="register.php" class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold hover:from-emerald-500 hover:to-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/50 hover:scale-105 text-sm sm:text-base">
                         Sign up
                     </a>
                 </div>
