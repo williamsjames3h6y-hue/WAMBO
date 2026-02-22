@@ -49,6 +49,11 @@ $stmt = $db->prepare("SELECT * FROM transactions WHERE user_id = :user_id ORDER 
 $stmt->execute([':user_id' => $userId]);
 $transactions = $stmt->fetchAll();
 
+// Get user profile to check withdrawal password
+$stmt = $db->prepare("SELECT withdrawal_password_hash FROM user_profiles WHERE id = :user_id");
+$stmt->execute([':user_id' => $userId]);
+$userProfile = $stmt->fetch();
+
 // Handle wallet actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -56,6 +61,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     if ($amount > 0) {
         if ($action === 'withdraw') {
+            $withdrawalPassword = $_POST['withdrawal_password'] ?? '';
+
+            if (empty($userProfile['withdrawal_password_hash'])) {
+                $_SESSION['error'] = 'Please set a withdrawal password in Payment Methods before withdrawing.';
+                redirect('dashboard.php');
+            }
+
+            if (empty($withdrawalPassword)) {
+                $_SESSION['error'] = 'Withdrawal password is required.';
+                redirect('dashboard.php');
+            }
+
+            if (!password_verify($withdrawalPassword, $userProfile['withdrawal_password_hash'])) {
+                $_SESSION['error'] = 'Invalid withdrawal password.';
+                redirect('dashboard.php');
+            }
+
             if ($amount <= ($wallet['total_earnings'] ?? 0)) {
                 $transactionId = generateUUID();
                 $stmt = $db->prepare("INSERT INTO transactions (id, user_id, wallet_id, type, amount, status, description) VALUES (:id, :user_id, :wallet_id, 'withdrawal', :amount, 'pending', :description)");
@@ -71,6 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmt->execute([':amount' => $amount, ':user_id' => $userId]);
 
                 $_SESSION['message'] = 'Withdrawal request submitted successfully!';
+                redirect('dashboard.php');
+            } else {
+                $_SESSION['error'] = 'Insufficient balance.';
                 redirect('dashboard.php');
             }
         } elseif ($action === 'deposit') {
@@ -247,6 +272,15 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                 </div>
                 <span class="text-white text-xs font-medium text-center">About Us</span>
             </button>
+
+            <a href="/certificate" class="flex flex-col items-center justify-center bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 border border-slate-700 hover:bg-slate-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300 animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <span class="text-white text-xs font-medium text-center">Certificate</span>
+            </a>
         </div>
 
         <!-- Membership Level -->
@@ -532,6 +566,20 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
                                 ${action === 'withdraw' ? `<p class="text-sm text-gray-400 mt-2">Available balance: $${<?php echo $wallet['total_earnings'] ?? 0; ?>.toFixed(2)}</p>` : ''}
                             </div>
 
+                            ${action === 'withdraw' ? `
+                            <div class="mb-6">
+                                <label class="block text-gray-300 text-sm font-semibold mb-3">Withdrawal Password</label>
+                                <input
+                                    type="password"
+                                    name="withdrawal_password"
+                                    placeholder="Enter your withdrawal password"
+                                    required
+                                    class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <p class="text-xs text-gray-500 mt-2">Set your withdrawal password in <a href="/payment_methods" class="text-blue-400 hover:underline">Payment Methods</a></p>
+                            </div>
+                            ` : ''}
+
                             <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4 mb-6">
                                 <div class="flex justify-between items-center text-sm">
                                     <span class="text-gray-400">Transaction Fee</span>
@@ -787,6 +835,11 @@ $heroImages = ['/public/AI.jpg', '/public/AI2.jpg', '/public/AI3.jpg', '/public/
         <?php if (isset($_SESSION['message'])): ?>
         alert('<?php echo addslashes($_SESSION['message']); ?>');
         <?php unset($_SESSION['message']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+        alert('<?php echo addslashes($_SESSION['error']); ?>');
+        <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
     </script>
 </body>
