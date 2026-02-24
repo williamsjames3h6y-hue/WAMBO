@@ -192,9 +192,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
     }
 }
 
-$totalTasks = count($updatedTasks);
+$totalTasks = 35;
 $completedTasks = count($submissions);
-$allCompleted = $completedTasks >= $totalTasks && $totalTasks > 0;
+$allCompleted = $completedTasks >= 35;
 
 $showPreloader = isset($_SESSION['show_preloader']) && $_SESSION['show_preloader'];
 unset($_SESSION['show_preloader']);
@@ -306,21 +306,30 @@ unset($_SESSION['show_preloader']);
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <?php if ($allCompleted): ?>
-        <!-- All Tasks Completed -->
-        <div class="text-center">
-            <svg class="w-24 h-24 text-green-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h2 class="text-4xl font-bold text-white mb-4">All Tasks Completed!</h2>
-            <p class="text-xl text-gray-300 mb-4">
-                You've completed all <?php echo $totalTasks; ?> tasks for today
-            </p>
-            <p class="text-lg text-gray-200 mb-8">
-                Total Earnings: <span class="font-bold text-green-400">$<?php echo number_format($dailyEarnings['total_earnings'] ?? 0, 2); ?></span>
-            </p>
-            <a href="/dashboard" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                Back to Dashboard
-            </a>
+        <!-- All 35 Tasks Completed - Contact Admin Popup -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-md mx-4 border border-slate-700">
+                <div class="text-center">
+                    <svg class="w-20 h-20 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h2 class="text-3xl font-bold text-white mb-3">All 35 Tasks Completed!</h2>
+                    <p class="text-lg text-gray-300 mb-4">
+                        Congratulations! You've completed all 35 tasks for today.
+                    </p>
+                    <div class="bg-slate-900/50 rounded-xl p-4 mb-6">
+                        <p class="text-sm text-gray-400 mb-2">Total Earnings Today</p>
+                        <p class="text-3xl font-bold text-green-400">$<?php echo number_format($dailyEarnings['total_earnings'] ?? 0, 2); ?></p>
+                    </div>
+                    <div class="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mb-6">
+                        <p class="text-white font-semibold mb-2">Want to Continue Working?</p>
+                        <p class="text-gray-300 text-sm">Please contact admin to unlock more tasks</p>
+                    </div>
+                    <a href="/dashboard" class="block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
         <?php elseif (isset($updatedTasks[$currentTaskIndex])): ?>
         <?php
