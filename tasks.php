@@ -23,26 +23,12 @@ $vipTier = $stmt->fetch();
 // Get today's date
 $today = date('Y-m-d');
 
-// Get today's submissions first
-$stmt = $db->prepare("SELECT * FROM user_task_submissions WHERE user_id = :user_id AND DATE(created_at) = :date");
-$stmt->execute([':user_id' => $userId, ':date' => $today]);
-$submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Get daily stats
-$stmt = $db->prepare("SELECT * FROM daily_earnings WHERE user_id = :user_id AND date = :date");
-$stmt->execute([':user_id' => $userId, ':date' => $today]);
-$dailyEarnings = $stmt->fetch();
-
-if (!$dailyEarnings) {
-    $dailyEarnings = ['tasks_completed' => 0, 'total_earnings' => 0];
-}
-
 // Get admin tasks for user's VIP level
 $stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required <= :vip_level ORDER BY task_order");
 $stmt->execute([':vip_level' => $vipTier['level']]);
 $allTasks = $stmt->fetchAll();
 
-// Handle task submission BEFORE rendering
+// Handle task submission BEFORE loading data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
     $taskId = $_POST['task_id'];
 
@@ -102,10 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
                 ':description' => "Brand identification task completed"
             ]);
 
+            // Get current daily earnings before updating
+            $stmt = $db->prepare("SELECT * FROM daily_earnings WHERE user_id = :user_id AND date = :date");
+            $stmt->execute([':user_id' => $userId, ':date' => $today]);
+            $currentDailyEarnings = $stmt->fetch();
+
             // Update daily earnings
-            if ($dailyEarnings && isset($dailyEarnings['id'])) {
-                $newTasksCompleted = intval($dailyEarnings['tasks_completed']) + 1;
-                $newTotalEarnings = floatval($dailyEarnings['total_earnings']) + floatval($currentTask['earning_amount']);
+            if ($currentDailyEarnings && isset($currentDailyEarnings['id'])) {
+                $newTasksCompleted = intval($currentDailyEarnings['tasks_completed']) + 1;
+                $newTotalEarnings = floatval($currentDailyEarnings['total_earnings']) + floatval($currentTask['earning_amount']);
                 $canWithdraw = $newTasksCompleted >= 35;
 
                 $stmt = $db->prepare("UPDATE daily_earnings SET tasks_completed = :tasks_completed, commission_earned = commission_earned + :commission, total_earnings = :total_earnings, can_withdraw = :can_withdraw WHERE id = :id");
@@ -114,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
                     ':commission' => $currentTask['earning_amount'],
                     ':total_earnings' => $newTotalEarnings,
                     ':can_withdraw' => $canWithdraw ? 1 : 0,
-                    ':id' => $dailyEarnings['id']
+                    ':id' => $currentDailyEarnings['id']
                 ]);
             } else {
                 $dailyEarningId = generateUUID();
@@ -132,6 +123,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
             redirect('/tasks');
         }
     }
+}
+
+// Load fresh data after potential submission
+$stmt = $db->prepare("SELECT * FROM user_task_submissions WHERE user_id = :user_id AND DATE(created_at) = :date");
+$stmt->execute([':user_id' => $userId, ':date' => $today]);
+$submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $db->prepare("SELECT * FROM daily_earnings WHERE user_id = :user_id AND date = :date");
+$stmt->execute([':user_id' => $userId, ':date' => $today]);
+$dailyEarnings = $stmt->fetch();
+
+if (!$dailyEarnings) {
+    $dailyEarnings = ['tasks_completed' => 0, 'total_earnings' => 0];
 }
 
 // Define all available product images (37 unique images)
