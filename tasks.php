@@ -20,49 +20,10 @@ $stmt = $db->prepare("SELECT vt.* FROM user_profiles up LEFT JOIN vip_tiers vt O
 $stmt->execute([':user_id' => $userId]);
 $vipTier = $stmt->fetch();
 
-// Define all available product images (37 unique images)
-$allProductImages = [
-    '/public/products/P1.jpg', '/public/products/P2.jpg', '/public/products/P3.jpg',
-    '/public/products/P4.jpg', '/public/products/P5.jpg', '/public/products/P6.jpg',
-    '/public/products/P7.jpg', '/public/products/P8.jpg', '/public/products/P9.jpg',
-    '/public/products/p10.jpg', '/public/products/p11.jpg', '/public/products/p12.jpg',
-    '/public/products/p13.jpg', '/public/products/p14.jpg', '/public/products/p15.jpg',
-    '/public/products/p16.jpg', '/public/products/p17.jpg', '/public/products/p18.jpg',
-    '/public/products/p19.jpg', '/public/products/p20.jpg', '/public/products/p21.jpg',
-    '/public/products/p22.jpg', '/public/products/p23.jpg', '/public/products/p24.jpg',
-    '/public/products/p25.jpg', '/public/products/p26.jpg', '/public/products/p27.jpg',
-    '/public/products/p28.jpg', '/public/products/p29.jpg', '/public/products/p30.jpg',
-    '/public/products/p31.jpg', '/public/products/p32.jpg', '/public/products/p33.jpg',
-    '/public/products/p34.jpg', '/public/products/p35.jpg', '/public/products/p36.jpg',
-    '/public/products/p37.jpg'
-];
-
-// Shuffle images for random assignment (ensure uniqueness per session)
-$shuffledImages = $allProductImages;
-shuffle($shuffledImages);
-
-// Get admin tasks for user's VIP level
-$stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required <= :vip_level ORDER BY RAND()");
-$stmt->execute([':vip_level' => $vipTier['level']]);
-$allTasks = $stmt->fetchAll();
-
-// Limit to 35 tasks randomly
-$tasks = array_slice($allTasks, 0, min(35, count($allTasks)));
-
-// Map unique product images to tasks with random product IDs
-$updatedTasks = [];
-foreach ($tasks as $index => $task) {
-    // Each task gets a unique image (no duplicates)
-    if ($index < count($shuffledImages)) {
-        $task['image_url'] = $shuffledImages[$index];
-        // Generate random product ID
-        $task['product_id'] = 'PROD-' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
-    }
-    $updatedTasks[] = $task;
-}
-
-// Get today's submissions
+// Get today's date
 $today = date('Y-m-d');
+
+// Get today's submissions first
 $stmt = $db->prepare("SELECT * FROM user_task_submissions WHERE user_id = :user_id AND DATE(created_at) = :date");
 $stmt->execute([':user_id' => $userId, ':date' => $today]);
 $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -76,31 +37,12 @@ if (!$dailyEarnings) {
     $dailyEarnings = ['tasks_completed' => 0, 'total_earnings' => 0];
 }
 
-// Find next incomplete task
-$currentTaskIndex = 0;
-$allTasksCompleted = true;
-foreach ($updatedTasks as $index => $task) {
-    $isCompleted = false;
-    foreach ($submissions as $submission) {
-        if ($submission['task_id'] === $task['id']) {
-            $isCompleted = true;
-            break;
-        }
-    }
-    if (!$isCompleted) {
-        $currentTaskIndex = $index;
-        $allTasksCompleted = false;
-        break;
-    }
-}
+// Get admin tasks for user's VIP level
+$stmt = $db->prepare("SELECT * FROM admin_tasks WHERE vip_level_required <= :vip_level ORDER BY task_order");
+$stmt->execute([':vip_level' => $vipTier['level']]);
+$allTasks = $stmt->fetchAll();
 
-// Check if user completed all 35 tasks
-$showCompletionPopup = false;
-if (count($submissions) >= 35 && count($updatedTasks) >= 35) {
-    $showCompletionPopup = true;
-}
-
-// Handle task submission
+// Handle task submission BEFORE rendering
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
     $taskId = $_POST['task_id'];
 
@@ -110,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
     $existing = $stmt->fetch();
 
     if (!$existing) {
-        // Find the task
+        // Find the task from database
         $currentTask = null;
-        foreach ($updatedTasks as $task) {
+        foreach ($allTasks as $task) {
             if ($task['id'] === $taskId) {
                 $currentTask = $task;
                 break;
@@ -189,6 +131,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_task'])) {
             $_SESSION['show_preloader'] = true;
             redirect('/tasks');
         }
+    }
+}
+
+// Define all available product images (37 unique images)
+$allProductImages = [
+    '/public/products/P1.jpg', '/public/products/P2.jpg', '/public/products/P3.jpg',
+    '/public/products/P4.jpg', '/public/products/P5.jpg', '/public/products/P6.jpg',
+    '/public/products/P7.jpg', '/public/products/P8.jpg', '/public/products/P9.jpg',
+    '/public/products/p10.jpg', '/public/products/p11.jpg', '/public/products/p12.jpg',
+    '/public/products/p13.jpg', '/public/products/p14.jpg', '/public/products/p15.jpg',
+    '/public/products/p16.jpg', '/public/products/p17.jpg', '/public/products/p18.jpg',
+    '/public/products/p19.jpg', '/public/products/p20.jpg', '/public/products/p21.jpg',
+    '/public/products/p22.jpg', '/public/products/p23.jpg', '/public/products/p24.jpg',
+    '/public/products/p25.jpg', '/public/products/p26.jpg', '/public/products/p27.jpg',
+    '/public/products/p28.jpg', '/public/products/p29.jpg', '/public/products/p30.jpg',
+    '/public/products/p31.jpg', '/public/products/p32.jpg', '/public/products/p33.jpg',
+    '/public/products/p34.jpg', '/public/products/p35.jpg', '/public/products/p36.jpg',
+    '/public/products/p37.jpg'
+];
+
+// Shuffle images for random assignment (ensure uniqueness per session)
+$shuffledImages = $allProductImages;
+shuffle($shuffledImages);
+
+// Limit to 35 tasks
+$tasks = array_slice($allTasks, 0, min(35, count($allTasks)));
+
+// Map unique product images to tasks with random product IDs
+$updatedTasks = [];
+foreach ($tasks as $index => $task) {
+    // Each task gets a unique image (no duplicates)
+    if ($index < count($shuffledImages)) {
+        $task['image_url'] = $shuffledImages[$index];
+        // Generate random product ID
+        $task['product_id'] = 'PROD-' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+    }
+    $updatedTasks[] = $task;
+}
+
+// Find next incomplete task
+$currentTaskIndex = 0;
+$allTasksCompleted = true;
+foreach ($updatedTasks as $index => $task) {
+    $isCompleted = false;
+    foreach ($submissions as $submission) {
+        if ($submission['task_id'] === $task['id']) {
+            $isCompleted = true;
+            break;
+        }
+    }
+    if (!$isCompleted) {
+        $currentTaskIndex = $index;
+        $allTasksCompleted = false;
+        break;
     }
 }
 
