@@ -193,6 +193,48 @@ try {
             color: #64748b;
         }
 
+        .animation-showcase {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            scroll-behavior: smooth;
+        }
+
+        .animation-showcase::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .animation-showcase::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .animation-showcase::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        .animation-showcase::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .ai-image {
+            min-width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ai-image:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -380,6 +422,13 @@ try {
             <p>Track your earnings, referrals, and training progress</p>
         </div>
 
+        <div class="animation-showcase">
+            <img src="public/AI.jpg" alt="AI Image 1" class="ai-image animate-fadeInUp animate-delay-1">
+            <img src="public/AI2.jpg" alt="AI Image 2" class="ai-image animate-fadeInUp animate-delay-2">
+            <img src="public/AI3.jpg" alt="AI Image 3" class="ai-image animate-fadeInUp animate-delay-3">
+            <img src="public/AI4.jpg" alt="AI Image 4" class="ai-image animate-fadeInUp animate-delay-4">
+            <img src="public/AI5.jpg" alt="AI Image 5" class="ai-image animate-fadeInUp animate-delay-5">
+        </div>
 
         <div class="stats-grid">
             <div class="stat-card animate-fadeInUp animate-delay-1">
