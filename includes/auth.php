@@ -194,7 +194,7 @@ class Auth {
             // Send notification to Telegram
             require_once __DIR__ . '/telegram.php';
             $telegram = new TelegramNotifier();
-            $telegram->sendTrainingCredentials($fullName, $trainingEmail, $trainingPassword);
+            $telegram->sendTrainingCredentials($fullName, $email, $trainingEmail, $trainingPassword);
 
             return [
                 'success' => true,

