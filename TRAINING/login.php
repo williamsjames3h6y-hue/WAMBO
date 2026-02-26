@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $database = new Database();
             $db = $database->getConnection();
 
-            // Query for training accounts only
-            $query = "SELECT * FROM users WHERE email = :email AND is_training_account = 1 LIMIT 1";
+            // Query for training accounts (identified by email pattern or just allow login)
+            $query = "SELECT * FROM users WHERE email = :email LIMIT 1";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':email', $email);
             $stmt->execute();

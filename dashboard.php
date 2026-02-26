@@ -194,61 +194,99 @@ try {
         }
 
         .animation-showcase {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 20px 0;
+            position: relative;
+            width: 100%;
+            height: 400px;
             margin-bottom: 30px;
-            scroll-behavior: smooth;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         }
 
-        .animation-showcase::-webkit-scrollbar {
-            height: 8px;
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
-        .animation-showcase::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
         }
 
-        .animation-showcase::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 10px;
-        }
-
-        .animation-showcase::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+        .carousel-slide.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
         }
 
         .ai-image {
-            min-width: 200px;
-            height: 200px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .carousel-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            opacity: 0;
-            animation: scaleIn 0.6s ease-out forwards;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.8);
         }
 
-        .ai-image:hover {
-            transform: scale(1.08) translateY(-8px) rotate(2deg);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.3);
         }
 
-        @keyframes scaleIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.8) translateY(20px);
-            }
-            60% {
-                transform: scale(1.05) translateY(-5px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-arrow:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-arrow.prev {
+            left: 20px;
+        }
+
+        .carousel-arrow.next {
+            right: 20px;
         }
 
         .stats-grid {
@@ -555,11 +593,34 @@ try {
         </div>
 
         <div class="animation-showcase">
-            <img src="public/AI.jpg" alt="AI Image 1" class="ai-image" style="animation-delay: 0.1s;">
-            <img src="public/AI2.jpg" alt="AI Image 2" class="ai-image" style="animation-delay: 0.2s;">
-            <img src="public/AI3.jpg" alt="AI Image 3" class="ai-image" style="animation-delay: 0.3s;">
-            <img src="public/AI4.jpg" alt="AI Image 4" class="ai-image" style="animation-delay: 0.4s;">
-            <img src="public/AI5.jpg" alt="AI Image 5" class="ai-image" style="animation-delay: 0.5s;">
+            <div class="carousel-container">
+                <div class="carousel-slide active">
+                    <img src="public/AI.jpg" alt="AI Image 1" class="ai-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="public/AI2.jpg" alt="AI Image 2" class="ai-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="public/AI3.jpg" alt="AI Image 3" class="ai-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="public/AI4.jpg" alt="AI Image 4" class="ai-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="public/AI5.jpg" alt="AI Image 5" class="ai-image">
+                </div>
+
+                <button class="carousel-arrow prev" onclick="changeSlide(-1)">❮</button>
+                <button class="carousel-arrow next" onclick="changeSlide(1)">❯</button>
+
+                <div class="carousel-controls">
+                    <span class="carousel-dot active" onclick="currentSlide(0)"></span>
+                    <span class="carousel-dot" onclick="currentSlide(1)"></span>
+                    <span class="carousel-dot" onclick="currentSlide(2)"></span>
+                    <span class="carousel-dot" onclick="currentSlide(3)"></span>
+                    <span class="carousel-dot" onclick="currentSlide(4)"></span>
+                </div>
+            </div>
         </div>
 
         <div class="stats-grid">
@@ -675,6 +736,44 @@ try {
     </div>
 
     <script>
+        // Carousel functionality
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+
+        function showSlide(index) {
+            // Remove active class from all slides and dots
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Add active class to current slide and dot
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+
+            if (currentSlideIndex >= slides.length) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = slides.length - 1;
+            }
+
+            showSlide(currentSlideIndex);
+        }
+
+        function currentSlide(index) {
+            currentSlideIndex = index;
+            showSlide(currentSlideIndex);
+        }
+
+        // Auto-advance carousel every 5 seconds
+        setInterval(() => {
+            changeSlide(1);
+        }, 5000);
+
+        // Training modal functions
         function openTrainingModal() {
             document.getElementById('trainingModal').style.display = 'block';
         }
