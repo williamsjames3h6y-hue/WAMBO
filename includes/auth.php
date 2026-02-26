@@ -10,7 +10,7 @@ class Auth {
     }
 
     // Register new user
-    public function register($email, $password, $fullName) {
+    public function register($email, $password, $fullName, $referralCode = '') {
         try {
             // Check if user already exists
             $query = "SELECT id FROM users WHERE email = :email";
@@ -20,6 +20,23 @@ class Auth {
 
             if ($stmt->rowCount() > 0) {
                 return ['success' => false, 'message' => 'Email already exists'];
+            }
+
+            // Validate referral code if provided
+            $referrerId = null;
+            if (!empty($referralCode)) {
+                try {
+                    $query = "SELECT id FROM users WHERE referral_code = :code LIMIT 1";
+                    $stmt = $this->db->prepare($query);
+                    $stmt->bindParam(':code', $referralCode);
+                    $stmt->execute();
+                    $referrer = $stmt->fetch();
+                    if ($referrer) {
+                        $referrerId = $referrer['id'];
+                    }
+                } catch (PDOException $e) {
+                    // Referral code column might not exist, continue without error
+                }
             }
 
             // Create user
@@ -44,6 +61,24 @@ class Auth {
                 // Column doesn't exist
             }
 
+            // Check for referral system columns
+            $hasReferralCodeColumn = false;
+            $hasReferredByColumn = false;
+            try {
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'referral_code'");
+                $hasReferralCodeColumn = $checkCol->rowCount() > 0;
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'referred_by'");
+                $hasReferredByColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {
+                // Columns don't exist
+            }
+
+            // Generate unique referral code for new user
+            $userReferralCode = null;
+            if ($hasReferralCodeColumn) {
+                $userReferralCode = strtoupper(substr(md5($userId . time() . rand()), 0, 10));
+            }
+
             // Build INSERT query based on available columns
             $fields = ['id', 'email', 'password_hash', 'email_confirmed'];
             $values = [':id', ':email', ':password_hash', 'TRUE'];
@@ -58,6 +93,16 @@ class Auth {
                 $values[] = ':username';
             }
 
+            if ($hasReferralCodeColumn) {
+                $fields[] = 'referral_code';
+                $values[] = ':referral_code';
+            }
+
+            if ($hasReferredByColumn && $referrerId) {
+                $fields[] = 'referred_by';
+                $values[] = ':referred_by';
+            }
+
             $query = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':id', $userId);
@@ -68,6 +113,14 @@ class Auth {
                 // Extract username from email
                 $username = explode('@', $email)[0];
                 $stmt->bindParam(':username', $username);
+            }
+
+            if ($hasReferralCodeColumn) {
+                $stmt->bindParam(':referral_code', $userReferralCode);
+            }
+
+            if ($hasReferredByColumn && $referrerId) {
+                $stmt->bindParam(':referred_by', $referrerId);
             }
 
             $stmt->execute();
@@ -94,6 +147,25 @@ class Auth {
             $stmt->bindParam(':id', $walletId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
+
+            // Create referral record if referred by someone
+            if ($referrerId) {
+                try {
+                    // Check if referrals table exists
+                    $checkTable = $this->db->query("SHOW TABLES LIKE 'referrals'");
+                    if ($checkTable->rowCount() > 0) {
+                        $referralId = generateUUID();
+                        $query = "INSERT INTO referrals (id, referrer_id, referred_id, status) VALUES (:id, :referrer_id, :referred_id, 'active')";
+                        $stmt = $this->db->prepare($query);
+                        $stmt->bindParam(':id', $referralId);
+                        $stmt->bindParam(':referrer_id', $referrerId);
+                        $stmt->bindParam(':referred_id', $userId);
+                        $stmt->execute();
+                    }
+                } catch (PDOException $e) {
+                    // Referrals table might not exist, continue without error
+                }
+            }
 
             return ['success' => true, 'message' => 'Registration successful', 'user_id' => $userId];
         } catch (PDOException $e) {

@@ -9,15 +9,19 @@ if (isLoggedIn()) {
 $error = '';
 $loading = false;
 
+// Capture referral code from URL
+$referralCode = isset($_GET['ref']) ? sanitizeInput($_GET['ref']) : '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitizeInput($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $fullName = sanitizeInput($_POST['fullName'] ?? '');
+    $referralCode = sanitizeInput($_POST['referral_code'] ?? '');
 
     if (!empty($email) && !empty($password) && !empty($fullName)) {
         require_once __DIR__ . '/includes/auth.php';
         $auth = new Auth();
-        $result = $auth->register($email, $password, $fullName);
+        $result = $auth->register($email, $password, $fullName, $referralCode);
 
         if ($result['success']) {
             // Auto-login after registration
@@ -649,6 +653,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" action="">
+                <!-- Hidden field for referral code -->
+                <input type="hidden" name="referral_code" value="<?php echo htmlspecialchars($referralCode); ?>">
+
+                <?php if (!empty($referralCode)): ?>
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 600;">
+                        🎁 You're signing up with a referral code!
+                    </div>
+                <?php endif; ?>
+
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
                     <div class="input-wrapper">
