@@ -73,8 +73,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         .animate-fadeIn {
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn 0.8s ease-out;
         }
 
         .animate-slideUp {
@@ -82,7 +111,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .animate-scaleIn {
-            animation: scaleIn 0.4s ease-out;
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.6s ease-out;
         }
 
         .animate-delay-100 {
@@ -117,24 +154,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(-2px);
         }
 
+        .input-group input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         .btn-hover {
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-hover::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-hover:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.6);
         }
 
         .btn-hover:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+        }
+
+        .bg-animated {
+            background-image: url('/public/image copy.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .bg-animated::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(16, 185, 129, 0.2) 100%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative animate-scaleIn">
-            <a href="index.php" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+<body class="min-h-screen bg-animated">
+    <div class="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div class="glass-effect rounded-3xl w-full max-w-md relative animate-scaleIn">
+            <a href="index.php" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform duration-300">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -214,9 +297,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <button
                         type="submit"
-                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 btn-hover animate-slideUp animate-delay-400"
+                        class="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 btn-hover animate-slideUp animate-delay-400 relative z-10"
                     >
-                        Create Account
+                        <span class="relative z-10">Create Account</span>
                     </button>
                 </form>
 
