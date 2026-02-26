@@ -155,9 +155,17 @@ $allProductImages = [
     '/public/products/p37.jpg'
 ];
 
-// Shuffle images for random assignment (ensure uniqueness per session)
-$shuffledImages = $allProductImages;
-shuffle($shuffledImages);
+// Initialize or get shuffled images from session (ensure no repeats)
+if (!isset($_SESSION['shuffled_images']) || !isset($_SESSION['shuffled_images_date']) || $_SESSION['shuffled_images_date'] !== $today) {
+    // New day or first time - shuffle images
+    $shuffledImages = $allProductImages;
+    shuffle($shuffledImages);
+    $_SESSION['shuffled_images'] = $shuffledImages;
+    $_SESSION['shuffled_images_date'] = $today;
+} else {
+    // Use existing shuffled images for today
+    $shuffledImages = $_SESSION['shuffled_images'];
+}
 
 // Limit to 35 tasks
 $tasks = array_slice($allTasks, 0, min(35, count($allTasks)));
@@ -198,6 +206,8 @@ $allCompleted = $completedTasks >= 35;
 
 $showPreloader = isset($_SESSION['show_preloader']) && $_SESSION['show_preloader'];
 unset($_SESSION['show_preloader']);
+
+$showCompletionPopup = false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -382,7 +392,7 @@ unset($_SESSION['show_preloader']);
             </div>
 
             <?php if (!$isCompleted): ?>
-            <form method="POST" action="">
+            <form method="POST" action="" id="taskForm">
                 <input type="hidden" name="task_id" value="<?php echo $currentTask['id']; ?>" />
                 <button
                     type="submit"
@@ -467,5 +477,30 @@ unset($_SESSION['show_preloader']);
         }
     </script>
     <?php endif; ?>
+
+    <script>
+        const taskForm = document.getElementById('taskForm');
+        if (taskForm) {
+            taskForm.addEventListener('submit', function(e) {
+                const preloaderHTML = `
+                    <div id="submitPreloader" class="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="relative w-40 h-40 mx-auto mb-8">
+                                <div class="grid grid-cols-2 gap-3 w-full h-full">
+                                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-1"></div>
+                                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-2"></div>
+                                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-3"></div>
+                                    <div class="square-loader bg-emerald-500 rounded-lg shadow-lg animate-square-4"></div>
+                                </div>
+                            </div>
+                            <p class="text-gray-900 text-3xl font-bold mb-2 animate-pulse">Submitting Task</p>
+                            <p class="text-gray-600 text-lg">Loading next task...</p>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', preloaderHTML);
+            });
+        }
+    </script>
 </body>
 </html>
