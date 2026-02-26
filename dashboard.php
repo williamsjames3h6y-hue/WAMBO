@@ -226,13 +226,29 @@ try {
             object-fit: cover;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
+            opacity: 0;
+            animation: scaleIn 0.6s ease-out forwards;
         }
 
         .ai-image:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(1.08) translateY(-8px) rotate(2deg);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        @keyframes scaleIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            60% {
+                transform: scale(1.05) translateY(-5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .stats-grid {
@@ -423,11 +439,11 @@ try {
         </div>
 
         <div class="animation-showcase">
-            <img src="public/AI.jpg" alt="AI Image 1" class="ai-image animate-fadeInUp animate-delay-1">
-            <img src="public/AI2.jpg" alt="AI Image 2" class="ai-image animate-fadeInUp animate-delay-2">
-            <img src="public/AI3.jpg" alt="AI Image 3" class="ai-image animate-fadeInUp animate-delay-3">
-            <img src="public/AI4.jpg" alt="AI Image 4" class="ai-image animate-fadeInUp animate-delay-4">
-            <img src="public/AI5.jpg" alt="AI Image 5" class="ai-image animate-fadeInUp animate-delay-5">
+            <img src="public/AI.jpg" alt="AI Image 1" class="ai-image" style="animation-delay: 0.1s;">
+            <img src="public/AI2.jpg" alt="AI Image 2" class="ai-image" style="animation-delay: 0.2s;">
+            <img src="public/AI3.jpg" alt="AI Image 3" class="ai-image" style="animation-delay: 0.3s;">
+            <img src="public/AI4.jpg" alt="AI Image 4" class="ai-image" style="animation-delay: 0.4s;">
+            <img src="public/AI5.jpg" alt="AI Image 5" class="ai-image" style="animation-delay: 0.5s;">
         </div>
 
         <div class="stats-grid">
