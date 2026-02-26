@@ -455,8 +455,6 @@ try {
                 <?php
                 $referralLink = 'https://' . $_SERVER['HTTP_HOST'] . '/register.php?ref=' . urlencode($user['referral_code']);
                 ?>
-                <p style="margin-bottom: 15px;"><strong style="color: #065f46;">Your Referral Code:</strong> <span style="font-size: 1.3em; color: #10b981; font-weight: bold; font-family: 'Courier New', monospace;"><?php echo htmlspecialchars($user['referral_code']); ?></span></p>
-
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #10b981;">
                     <p style="margin-bottom: 8px; color: #065f46; font-weight: 600;">Your Referral Link:</p>
                     <div style="display: flex; gap: 10px; align-items: center;">
