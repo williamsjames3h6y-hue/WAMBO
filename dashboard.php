@@ -621,25 +621,71 @@ unset($_SESSION['success']);
             </div>
         </div>
 
-        <div style="text-align: center; margin-bottom: 32px;">
-            <h2 style="color: white; margin-bottom: 16px;">Membership Level</h2>
-            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-                <a href="/training/login.php" class="action-card" style="max-width: 140px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: nowrap; overflow-x: auto; padding: 0 10px;">
+                <a href="/training/login.php" class="action-card" style="max-width: 140px; min-width: 120px;">
                     <div class="action-icon">📚</div>
                     <div class="action-label">Start Training</div>
                 </a>
-                <a href="/tasks.php" class="action-card <?php echo !$trainingCompleted ? 'locked' : ''; ?>" style="max-width: 140px;" <?php echo !$trainingCompleted ? 'onclick="return false;"' : ''; ?>>
+                <a href="/tasks.php" class="action-card <?php echo !$trainingCompleted ? 'locked' : ''; ?>" style="max-width: 140px; min-width: 120px;" <?php echo !$trainingCompleted ? 'onclick="return false;"' : ''; ?>>
                     <div class="action-icon">📊</div>
                     <div class="action-label">Start Tasks</div>
                 </a>
-                <a href="/payment_methods.php" class="action-card" style="max-width: 140px;">
+                <a href="/payment_methods.php" class="action-card" style="max-width: 140px; min-width: 120px;">
                     <div class="action-icon">💰</div>
                     <div class="action-label">Wallet</div>
                 </a>
-                <a href="/profile.php" class="action-card" style="max-width: 140px;">
+                <a href="/profile.php" class="action-card" style="max-width: 140px; min-width: 120px;">
                     <div class="action-icon">📝</div>
                     <div class="action-label">Record</div>
                 </a>
+            </div>
+        </div>
+
+        <?php
+        // VIP commission rates
+        $vipRates = [
+            1 => 0.5,
+            2 => 1.0,
+            3 => 2.3,
+            4 => 4.0,
+            5 => 5.5
+        ];
+        $currentVipLevel = $user['vip_level'] ?? 1;
+        $currentRate = $vipRates[$currentVipLevel];
+        $exampleProduct = 200;
+        $exampleEarning = ($exampleProduct * $currentRate) / 100;
+        ?>
+
+        <div style="background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 24px; margin-bottom: 32px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <h3 style="text-align: center; color: #1e40af; margin-bottom: 20px; font-size: 1.3rem;">VIP Commission Rates</h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <?php foreach ($vipRates as $level => $rate): ?>
+                    <div style="background: <?php echo $level == $currentVipLevel ? 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)' : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)'; ?>;
+                                border-radius: 12px;
+                                padding: 16px;
+                                text-align: center;
+                                border: <?php echo $level == $currentVipLevel ? '3px solid #fbbf24' : '2px solid #cbd5e1'; ?>;
+                                position: relative;
+                                transition: transform 0.3s;">
+                        <?php if ($level == $currentVipLevel): ?>
+                            <div style="position: absolute; top: -10px; right: -10px; background: #fbbf24; color: #1e40af; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">✓</div>
+                        <?php endif; ?>
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;"><?php echo $level == $currentVipLevel ? '👑' : '⭐'; ?></div>
+                        <div style="font-weight: bold; font-size: 1.1rem; color: <?php echo $level == $currentVipLevel ? '#ffffff' : '#1e40af'; ?>; margin-bottom: 4px;">VIP <?php echo $level; ?></div>
+                        <div style="font-size: 1.3rem; font-weight: bold; color: <?php echo $level == $currentVipLevel ? '#fbbf24' : '#059669'; ?>;"><?php echo number_format($rate, 1); ?>%</div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-left: 4px solid #059669; padding: 16px; border-radius: 8px; text-align: center;">
+                <div style="color: #065f46; font-size: 0.95rem; margin-bottom: 8px;">
+                    <strong>Your Current Rate (VIP <?php echo $currentVipLevel; ?>):</strong> <?php echo number_format($currentRate, 1); ?>%
+                </div>
+                <div style="color: #047857; font-size: 1.1rem; font-weight: bold;">
+                    Example: $<?php echo number_format($exampleProduct, 2); ?> product = $<?php echo number_format($exampleEarning, 2); ?> commission
+                </div>
             </div>
         </div>
 
