@@ -259,11 +259,6 @@ try {
             overflow: hidden;
         }
 
-        .task-vip-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
 
         .task-image {
             width: 100%;
@@ -523,7 +518,6 @@ try {
 
     <div class="container">
         <div class="vip-section">
-            <?php echo renderVipBadge($vipLevel, 'large'); ?>
             <div class="vip-info">
                 <h2>Welcome, <?php echo htmlspecialchars($fullName); ?></h2>
                 <p>Your VIP Level: <?php echo $vipLevel; ?> | Balance: $<?php echo number_format($balance, 2); ?></p>
@@ -564,10 +558,6 @@ try {
         <?php else: ?>
             <?php foreach ($tasks as $task): ?>
                 <div class="task-card">
-                    <div class="task-vip-badge">
-                        <?php echo renderVipBadgeInline($vipLevel); ?>
-                    </div>
-
                     <img src="<?php echo htmlspecialchars($task['image_url'] ?? 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800'); ?>"
                          alt="Task Product"
                          class="task-image">
