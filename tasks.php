@@ -20,8 +20,18 @@ try {
     $hasTaskLimit = false;
 }
 
+// Check if training_completed column exists in users table
+$hasTrainingCompleted = false;
+try {
+    $checkTraining = $db->query("SHOW COLUMNS FROM users LIKE 'training_completed'");
+    $hasTrainingCompleted = $checkTraining->rowCount() > 0;
+} catch (PDOException $e) {
+    $hasTrainingCompleted = false;
+}
+
 $taskLimitField = $hasTaskLimit ? ', vt.daily_task_limit' : '';
-$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance, u.training_completed
+$trainingField = $hasTrainingCompleted ? ', u.training_completed' : '';
+$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance{$trainingField}
           FROM user_profiles up
           LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
           LEFT JOIN wallets w ON w.user_id = up.id
