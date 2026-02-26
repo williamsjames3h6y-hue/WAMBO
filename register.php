@@ -137,26 +137,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .register-container {
             display: flex;
-            width: 90%;
-            max-width: 1200px;
-            background: rgba(255, 255, 255, 0.98);
+            width: 95%;
+            max-width: 1400px;
+            background: transparent;
             border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            overflow: visible;
             min-height: 700px;
             animation: fadeIn 0.6s ease-out;
             position: relative;
             z-index: 1;
+            gap: 40px;
         }
 
         .register-form-section {
-            flex: 1;
-            padding: 60px;
+            flex: 0 0 450px;
+            max-width: 450px;
+            padding: 45px 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             animation: slideInLeft 0.8s ease-out;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            margin: auto 0;
         }
 
         .register-image-section {
@@ -168,6 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
             overflow: hidden;
             animation: slideInRight 0.8s ease-out;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .register-image-section::before {
@@ -291,33 +298,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .logo {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #1e293b;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             animation: slideInLeft 0.6s ease-out;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 1.9rem;
             color: #1e293b;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 800;
             animation: slideInLeft 0.7s ease-out;
         }
 
         .subtitle {
             color: #64748b;
-            margin-bottom: 45px;
-            font-size: 1rem;
+            margin-bottom: 35px;
+            font-size: 0.95rem;
             animation: slideInLeft 0.8s ease-out;
         }
 
         .form-group {
-            margin-bottom: 28px;
+            margin-bottom: 22px;
             animation: fadeIn 1s ease-out;
             animation-fill-mode: both;
         }
@@ -328,10 +335,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #1e293b;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .input-wrapper {
@@ -340,20 +347,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .input-icon {
             position: absolute;
-            left: 18px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
             z-index: 1;
         }
 
         input {
             width: 100%;
-            padding: 16px 18px 16px 52px;
+            padding: 13px 16px 13px 48px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             background: #f8fafc;
             position: relative;
@@ -373,16 +380,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn-register {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.4s ease;
-            margin-top: 15px;
+            margin-top: 10px;
             animation: fadeIn 1.2s ease-out;
             position: relative;
             overflow: hidden;
@@ -426,7 +433,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .links {
             text-align: center;
-            margin-top: 35px;
+            margin-top: 25px;
             animation: fadeIn 1.3s ease-out;
         }
 
@@ -436,6 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
             transition: all 0.3s ease;
             display: inline-block;
+            font-size: 0.9rem;
         }
 
         .links a:hover {
@@ -444,22 +452,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .divider {
-            margin: 22px 0;
+            margin: 15px 0;
             text-align: center;
             color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .support-link {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             color: #10b981;
             text-decoration: none;
             font-weight: 600;
-            margin-top: 18px;
+            margin-top: 12px;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
         .support-link:hover {
@@ -467,19 +476,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: scale(1.05);
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 1024px) {
             .register-container {
                 flex-direction: column;
-                max-width: 500px;
+                max-width: 90%;
+                gap: 30px;
+                padding: 20px 0;
+            }
+
+            .register-form-section {
+                flex: none;
+                max-width: 100%;
+                width: 100%;
+                padding: 35px 30px;
+                margin: 0;
             }
 
             .register-image-section {
                 order: -1;
-                min-height: 350px;
+                min-height: 300px;
+                width: 100%;
             }
 
-            .register-form-section {
-                padding: 45px 35px;
+            .image-content {
+                padding: 40px 30px;
             }
 
             .image-content h2 {
@@ -487,7 +507,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.7rem;
             }
 
             .feature-list {
@@ -497,6 +517,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .feature-item {
                 font-size: 0.95rem;
                 padding: 12px 15px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body::before,
+            body::after {
+                display: none;
+            }
+
+            .register-container {
+                width: 100%;
+                padding: 15px;
+                gap: 20px;
+            }
+
+            .register-form-section {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+
+            .register-image-section {
+                min-height: 250px;
+                border-radius: 16px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 25px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            input {
+                padding: 12px 14px 12px 44px;
+                font-size: 0.9rem;
+            }
+
+            .input-icon {
+                font-size: 1rem;
+                left: 14px;
+            }
+
+            .btn-register {
+                padding: 13px;
+                font-size: 0.95rem;
+            }
+
+            .image-content {
+                padding: 30px 20px;
+            }
+
+            .image-content h2 {
+                font-size: 1.6rem;
+            }
+
+            .image-content p {
+                font-size: 1rem;
+            }
+
+            .feature-list {
+                margin-top: 20px;
+            }
+
+            .feature-item {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+                gap: 12px;
+            }
+
+            .feature-icon {
+                font-size: 1.4rem;
+                min-width: 40px;
+                height: 40px;
+                padding: 8px;
+            }
+
+            .links {
+                margin-top: 20px;
+            }
+
+            .links a {
+                font-size: 0.85rem;
             }
         }
     </style>
