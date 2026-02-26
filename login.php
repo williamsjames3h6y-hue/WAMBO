@@ -57,8 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
+            padding: 20px 0;
         }
 
         body::before {
@@ -378,6 +380,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             h1 {
                 font-size: 1.6rem;
+            }
+
+            body {
+                align-items: flex-start;
+            }
+
+            .login-container {
+                margin: 20px auto;
+                min-height: auto;
+            }
+
+            html {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body::before,
+            body::after {
+                display: none;
+            }
+
+            .login-container {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .login-form-section {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+
+            .login-image-section {
+                min-height: 200px;
+                border-radius: 16px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
             }
         }
     </style>

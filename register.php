@@ -54,8 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
+            padding: 20px 0;
         }
 
         body::before {
@@ -609,6 +611,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .links a {
                 font-size: 0.85rem;
+            }
+
+            body {
+                align-items: flex-start;
+                min-height: 100vh;
+            }
+
+            .register-container {
+                margin: 20px auto;
+                min-height: auto;
+            }
+
+            html {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
     </style>
