@@ -65,8 +65,17 @@ try {
     if (!isset($user['balance'])) {
         $user['balance'] = 0;
     }
-    if (!isset($user['referral_code'])) {
-        $user['referral_code'] = 'N/A';
+    if (!isset($user['referral_code']) || empty($user['referral_code'])) {
+        // Generate a referral code if it doesn't exist
+        $referralCode = strtoupper(substr(md5($user['id'] . time()), 0, 10));
+        try {
+            $updateCode = $db->prepare("UPDATE users SET referral_code = :code WHERE id = :id");
+            $updateCode->execute([':code' => $referralCode, ':id' => $user['id']]);
+            $user['referral_code'] = $referralCode;
+        } catch (PDOException $e) {
+            // If column doesn't exist, show setup message
+            $user['referral_code'] = null;
+        }
     }
     if (!isset($user['training_completed'])) {
         $user['training_completed'] = false;
@@ -368,8 +377,15 @@ try {
         </div>
 
         <div class="info-box">
-            <p><strong>Your Referral Code:</strong> <?php echo htmlspecialchars($user['referral_code']); ?></p>
-            <p style="margin-top: 10px;">Share this code with friends to earn commissions!</p>
+            <?php if ($user['referral_code']): ?>
+                <p><strong>Your Referral Code:</strong> <span style="font-size: 1.2em; color: #10b981; font-weight: bold;"><?php echo htmlspecialchars($user['referral_code']); ?></span></p>
+                <p style="margin-top: 10px;">Share this code with friends to earn commissions!</p>
+            <?php else: ?>
+                <p><strong>Referral System Not Set Up</strong></p>
+                <p style="margin-top: 10px;">
+                    <a href="setup_referral_system.php" style="color: #10b981; text-decoration: underline;">Click here to set up your referral system</a> and start earning commissions from referrals!
+                </p>
+            <?php endif; ?>
         </div>
 
         <h2 style="margin-bottom: 20px; color: #1e293b;">Quick Actions</h2>

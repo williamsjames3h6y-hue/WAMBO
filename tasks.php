@@ -11,7 +11,17 @@ $db = $database->getConnection();
 
 $userId = $_SESSION['user_id'];
 
-$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.daily_task_limit, vt.max_tasks_per_day, w.balance, u.training_completed
+// Check if daily_task_limit column exists
+$hasTaskLimit = false;
+try {
+    $checkCol = $db->query("SHOW COLUMNS FROM vip_tiers LIKE 'daily_task_limit'");
+    $hasTaskLimit = $checkCol->rowCount() > 0;
+} catch (PDOException $e) {
+    $hasTaskLimit = false;
+}
+
+$taskLimitField = $hasTaskLimit ? ', vt.daily_task_limit' : '';
+$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance, u.training_completed
           FROM user_profiles up
           LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
           LEFT JOIN wallets w ON w.user_id = up.id
