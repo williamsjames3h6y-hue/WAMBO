@@ -253,6 +253,105 @@ try {
             echo json_encode(['success' => true, 'message' => 'Settings updated successfully']);
             break;
 
+        case 'create_training_account':
+            $email = sanitizeInput($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $fullName = sanitizeInput($_POST['full_name'] ?? '');
+
+            if (empty($email) || empty($password) || empty($fullName)) {
+                throw new Exception('Email, password, and full name are required');
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception('Invalid email format');
+            }
+
+            // Check if user already exists
+            $stmt = $db->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+            if ($stmt->rowCount() > 0) {
+                throw new Exception('Email already exists');
+            }
+
+            // Check if training_completed column exists
+            $hasTrainingColumn = false;
+            try {
+                $checkCol = $db->query("SHOW COLUMNS FROM users LIKE 'training_completed'");
+                $hasTrainingColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {
+                // Column doesn't exist, will be created
+            }
+
+            // If column doesn't exist, create it
+            if (!$hasTrainingColumn) {
+                $db->exec("ALTER TABLE users ADD COLUMN training_completed TINYINT(1) DEFAULT 0 AFTER email_confirmed");
+            }
+
+            // Check if username column exists
+            $hasUsernameColumn = false;
+            try {
+                $checkCol = $db->query("SHOW COLUMNS FROM users LIKE 'username'");
+                $hasUsernameColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {
+                // Column doesn't exist
+            }
+
+            // Create training account
+            $userId = generateUUID();
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+            // Build INSERT query
+            $fields = ['id', 'email', 'password_hash', 'email_confirmed', 'training_completed'];
+            $values = [':id', ':email', ':password_hash', 'TRUE', '0'];  // training_completed = 0 for training accounts
+
+            if ($hasUsernameColumn) {
+                $fields[] = 'username';
+                $values[] = ':username';
+            }
+
+            $query = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $userId);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password_hash', $passwordHash);
+
+            if ($hasUsernameColumn) {
+                $username = explode('@', $email)[0];
+                $stmt->bindParam(':username', $username);
+            }
+
+            $stmt->execute();
+
+            // Get VIP 1 tier
+            $stmt = $db->prepare("SELECT id FROM vip_tiers WHERE level = 1 LIMIT 1");
+            $stmt->execute();
+            $vipTier = $stmt->fetch();
+
+            // Create user profile
+            $stmt = $db->prepare("INSERT INTO user_profiles (id, email, full_name, vip_tier_id) VALUES (:id, :email, :full_name, :vip_tier_id)");
+            $stmt->execute([
+                ':id' => $userId,
+                ':email' => $email,
+                ':full_name' => $fullName,
+                ':vip_tier_id' => $vipTier['id']
+            ]);
+
+            // Create wallet
+            $walletId = generateUUID();
+            $stmt = $db->prepare("INSERT INTO wallets (id, user_id, balance, total_earnings) VALUES (:id, :user_id, 0.00, 0.00)");
+            $stmt->execute([
+                ':id' => $walletId,
+                ':user_id' => $userId
+            ]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Training account created successfully',
+                'user_id' => $userId,
+                'email' => $email
+            ]);
+            break;
+
         default:
             throw new Exception('Invalid action: ' . $action);
     }

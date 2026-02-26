@@ -177,9 +177,15 @@ while ($row = $stmt->fetch()) {
 
                 <?php elseif ($activeTab === 'users'): ?>
                 <div class="bg-yellow-900/30 rounded-xl border border-yellow-600 overflow-hidden">
-                    <div class="p-4 border-b border-yellow-600">
-                        <h3 class="text-xl font-bold text-white">User Management</h3>
-                        <p class="text-yellow-100 text-sm">Manage user accounts, balances, and VIP tiers</p>
+                    <div class="p-4 border-b border-yellow-600 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-bold text-white">User Management</h3>
+                            <p class="text-yellow-100 text-sm">Manage user accounts, balances, and VIP tiers</p>
+                        </div>
+                        <button onclick="openTrainingAccountModal()" class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg">
+                            <span>🎓</span>
+                            <span>Create Training Account</span>
+                        </button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -687,6 +693,98 @@ while ($row = $stmt->fetch()) {
                 alert('Error: ' + data.error);
             }
         }
+
+        // Training Account Modal Functions
+        function openTrainingAccountModal() {
+            document.getElementById('trainingAccountModal').classList.remove('hidden');
+        }
+
+        function closeTrainingAccountModal() {
+            document.getElementById('trainingAccountModal').classList.add('hidden');
+            document.getElementById('trainingAccountForm').reset();
+        }
+
+        async function createTrainingAccount(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            formData.append('action', 'create_training_account');
+
+            try {
+                const response = await fetch('/api/admin_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Training account created successfully!\\n\\nEmail: ' + data.email);
+                    closeTrainingAccountModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || data.message));
+                }
+            } catch (error) {
+                alert('Error creating training account: ' + error.message);
+            }
+        }
+
+        // Close modal on outside click
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('trainingAccountModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeTrainingAccountModal();
+                    }
+                });
+            }
+        });
     </script>
+
+    <!-- Training Account Modal -->
+    <div id="trainingAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-yellow-900 to-amber-900 rounded-xl border border-yellow-600 max-w-md w-full shadow-2xl" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-yellow-600 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🎓</span>
+                    <span>Create Training Account</span>
+                </h3>
+                <button onclick="closeTrainingAccountModal()" class="text-yellow-300 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="trainingAccountForm" onsubmit="createTrainingAccount(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-yellow-200 text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" name="full_name" required class="w-full px-4 py-2 bg-yellow-800/30 border border-yellow-600 rounded-lg text-white placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Enter full name">
+                </div>
+                <div>
+                    <label class="block text-yellow-200 text-sm font-medium mb-2">Email</label>
+                    <input type="email" name="email" required class="w-full px-4 py-2 bg-yellow-800/30 border border-yellow-600 rounded-lg text-white placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Enter email">
+                </div>
+                <div>
+                    <label class="block text-yellow-200 text-sm font-medium mb-2">Password</label>
+                    <input type="password" name="password" required minlength="6" class="w-full px-4 py-2 bg-yellow-800/30 border border-yellow-600 rounded-lg text-white placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Enter password (min 6 characters)">
+                </div>
+                <div class="bg-orange-900/30 border border-orange-600 rounded-lg p-3">
+                    <p class="text-orange-200 text-sm">
+                        <strong>Note:</strong> Training accounts will display the TRAINING badge and are used for demonstration purposes.
+                    </p>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-lg">
+                        Create Account
+                    </button>
+                    <button type="button" onclick="closeTrainingAccountModal()" class="px-6 py-3 bg-yellow-800/30 hover:bg-yellow-800/50 text-yellow-200 rounded-lg font-semibold transition-all border border-yellow-600">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

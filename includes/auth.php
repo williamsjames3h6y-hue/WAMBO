@@ -26,11 +26,50 @@ class Auth {
             $userId = generateUUID();
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-            $query = "INSERT INTO users (id, email, password_hash, email_confirmed) VALUES (:id, :email, :password_hash, TRUE)";
+            // Check if training_completed column exists
+            $hasTrainingColumn = false;
+            try {
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'training_completed'");
+                $hasTrainingColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {
+                // Column doesn't exist
+            }
+
+            // Check if username column exists
+            $hasUsernameColumn = false;
+            try {
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'username'");
+                $hasUsernameColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {
+                // Column doesn't exist
+            }
+
+            // Build INSERT query based on available columns
+            $fields = ['id', 'email', 'password_hash', 'email_confirmed'];
+            $values = [':id', ':email', ':password_hash', 'TRUE'];
+
+            if ($hasTrainingColumn) {
+                $fields[] = 'training_completed';
+                $values[] = '1';  // Set to 1 (true) for personal accounts
+            }
+
+            if ($hasUsernameColumn) {
+                $fields[] = 'username';
+                $values[] = ':username';
+            }
+
+            $query = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':id', $userId);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password_hash', $passwordHash);
+
+            if ($hasUsernameColumn) {
+                // Extract username from email
+                $username = explode('@', $email)[0];
+                $stmt->bindParam(':username', $username);
+            }
+
             $stmt->execute();
 
             // Get VIP 1 tier
