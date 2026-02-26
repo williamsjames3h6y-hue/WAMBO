@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user && password_verify($password, $user['password_hash'])) {
                 // Check if this is a training account
-                if (strpos($user['email'], '@training.earningsllc.com') !== false) {
+                if (strpos($user['email'], '@training.com') !== false) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['email'] = $user['email'];
                     $_SESSION['username'] = $user['username'] ?? explode('@', $user['email'])[0];
@@ -565,7 +565,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="shape"></div>
             </div>
             <div class="image-content">
-                <img src="../public/image.png" alt="Training Logo" class="training-logo">
                 <h2>Welcome to Training</h2>
                 <p>Learn the skills you need to succeed and earn while you train. Complete your training modules and start earning rewards.</p>
             </div>

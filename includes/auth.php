@@ -100,7 +100,7 @@ class Auth {
 
             if ($hasTrainingColumn) {
                 $fields[] = 'training_completed';
-                $values[] = '1';  // Set to 1 (true) for personal accounts
+                $values[] = '0';  // Set to 0 (false) - must complete training first
             }
 
             if ($hasUsernameColumn) {
