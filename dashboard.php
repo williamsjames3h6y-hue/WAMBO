@@ -406,6 +406,117 @@ try {
             margin-bottom: 10px;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 600px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #1e293b;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .modal-body p {
+            margin-bottom: 20px;
+        }
+
+        .modal-body strong {
+            color: #1e293b;
+            display: block;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .highlight-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
+            color: #92400e;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            text-align: center;
+        }
+
+        .btn-close-modal {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-close-modal:hover {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -419,6 +530,11 @@ try {
 
             .welcome h1 {
                 font-size: 1.5rem;
+            }
+
+            .modal-content {
+                margin: 10% 20px;
+                padding: 30px 20px;
             }
         }
     </style>
@@ -516,7 +632,7 @@ try {
 
         <h2 style="margin-bottom: 20px; color: #1e293b;" class="animate-slideInRight animate-delay-6">Quick Actions</h2>
         <div class="quick-actions">
-            <a href="training.php" class="action-btn animate-fadeInUp animate-delay-1">
+            <a href="#" onclick="openTrainingModal(); return false;" class="action-btn animate-fadeInUp animate-delay-1">
                 <div class="icon">📚</div>
                 <div>Start Training</div>
             </a>
@@ -534,5 +650,47 @@ try {
             </a>
         </div>
     </div>
+
+    <!-- Training Modal -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🎓</div>
+                <h2>Training Account Information</h2>
+            </div>
+            <div class="modal-body">
+                <p><strong>CONTACT ADMIN OR YOUR INSTRUCTOR TO GUIDE YOU ON THE TRAINING.</strong></p>
+
+                <div class="highlight-box">
+                    <p>NB: YOU WILL BE GIVEN LOGINS FOR YOUR TRAINING ACCOUNT. MAKE SURE YOU SAVE YOUR PERSONAL ACCOUNT LOGINS AND NEVER SHARE YOUR TRAINING ACCOUNT INFO.</p>
+                </div>
+
+                <p><strong>COMPLETING TRAINING YOU WILL ALSO EARN</strong></p>
+                <p>By completing your training, you will gain valuable skills and earn rewards for your progress!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close-modal" onclick="closeAndRedirect()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTrainingModal() {
+            document.getElementById('trainingModal').style.display = 'block';
+        }
+
+        function closeAndRedirect() {
+            // Log out from personal account
+            window.location.href = 'logout.php?redirect=/TRAINING/login.php';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('trainingModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
