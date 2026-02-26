@@ -24,12 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['username'] = $user['username'] ?? explode('@', $user['email'])[0];
-                $_SESSION['is_training'] = true;
-                header('Location: /training/tasks.php');
-                exit;
+                // Check if this is a training account
+                if (strpos($user['email'], '@training.earningsllc.com') !== false) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['username'] = $user['username'] ?? explode('@', $user['email'])[0];
+                    $_SESSION['is_training'] = true;
+                    header('Location: /training/tasks.php');
+                    exit;
+                } else {
+                    $error = 'This login is only for training accounts. Please use the main login page for personal accounts.';
+                }
             } else {
                 $error = 'Invalid email or password. Please use your training account credentials.';
             }

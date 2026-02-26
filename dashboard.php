@@ -624,11 +624,7 @@ unset($_SESSION['success']);
         <div style="text-align: center; margin-bottom: 32px;">
             <h2 style="color: white; margin-bottom: 16px;">Membership Level</h2>
             <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-                <a href="/dashboard.php" class="action-card" style="max-width: 140px;">
-                    <div class="action-icon">🏠</div>
-                    <div class="action-label">Home</div>
-                </a>
-                <a href="#" onclick="handleStartTraining(); return false;" class="action-card" style="max-width: 140px;">
+                <a href="/training/login.php" class="action-card" style="max-width: 140px;">
                     <div class="action-icon">📚</div>
                     <div class="action-label">Start Training</div>
                 </a>
@@ -713,20 +709,6 @@ unset($_SESSION['success']);
     </div>
 
     <script>
-        const isTrainingAccount = <?php echo $isTrainingAccount ? 'true' : 'false'; ?>;
-
-        function handleStartTraining() {
-            if (isTrainingAccount) {
-                // Already logged into training account, go to training tasks
-                window.location.href = '/training/tasks.php';
-            } else {
-                // Not training account, redirect to training login
-                if (confirm('You need to login with your training account to access training tasks. Go to training login?')) {
-                    window.location.href = '/training/login.php';
-                }
-            }
-        }
-
         function copyReferralLink() {
             const input = document.getElementById('referralLink');
             input.select();
