@@ -229,6 +229,54 @@ try {
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        .animate-delay-5 { animation-delay: 0.5s; }
+        .animate-delay-6 { animation-delay: 0.6s; }
+
         .stat-icon {
             font-size: 2rem;
             margin-bottom: 15px;
@@ -350,36 +398,51 @@ try {
     </div>
 
     <div class="container">
-        <div class="welcome">
+        <div class="welcome animate-slideInRight">
             <h1>Dashboard</h1>
             <p>Track your earnings, referrals, and training progress</p>
         </div>
 
 
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card animate-fadeInUp animate-delay-1">
                 <div class="stat-icon">💵</div>
                 <div class="stat-label">Account Balance</div>
                 <div class="stat-value success">$<?php echo number_format($user['balance'], 2); ?></div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card animate-fadeInUp animate-delay-2">
                 <div class="stat-icon">🎓</div>
                 <div class="stat-label">Training Earnings</div>
                 <div class="stat-value success">$<?php echo number_format($trainingEarnings, 2); ?></div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card animate-fadeInUp animate-delay-3">
                 <div class="stat-icon">👥</div>
                 <div class="stat-label">Total Referrals</div>
                 <div class="stat-value"><?php echo $totalReferrals; ?></div>
             </div>
         </div>
 
-        <div class="info-box">
+        <div class="info-box animate-fadeInUp animate-delay-5" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981;">
             <?php if ($user['referral_code']): ?>
-                <p><strong>Your Referral Code:</strong> <span style="font-size: 1.2em; color: #10b981; font-weight: bold;"><?php echo htmlspecialchars($user['referral_code']); ?></span></p>
-                <p style="margin-top: 10px;">Share this code with friends to earn commissions!</p>
+                <?php
+                $referralLink = 'https://' . $_SERVER['HTTP_HOST'] . '/register.php?ref=' . urlencode($user['referral_code']);
+                ?>
+                <p style="margin-bottom: 15px;"><strong style="color: #065f46;">Your Referral Code:</strong> <span style="font-size: 1.3em; color: #10b981; font-weight: bold; font-family: 'Courier New', monospace;"><?php echo htmlspecialchars($user['referral_code']); ?></span></p>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #10b981;">
+                    <p style="margin-bottom: 8px; color: #065f46; font-weight: 600;">Your Referral Link:</p>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="referralLink" value="<?php echo htmlspecialchars($referralLink); ?>" readonly style="flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9em; background: #f9fafb; color: #374151;">
+                        <button onclick="copyReferralLink()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s ease;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                            📋 Copy Link
+                        </button>
+                    </div>
+                    <p id="copyMessage" style="color: #10b981; margin-top: 8px; font-size: 0.85em; font-weight: 600; opacity: 0; transition: opacity 0.3s ease;"></p>
+                </div>
+
+                <p style="margin-top: 10px; color: #065f46;">Share this link with friends to earn commissions on their earnings!</p>
             <?php else: ?>
                 <p><strong>Referral System Not Set Up</strong></p>
                 <p style="margin-top: 10px;">
@@ -388,21 +451,44 @@ try {
             <?php endif; ?>
         </div>
 
-        <h2 style="margin-bottom: 20px; color: #1e293b;">Quick Actions</h2>
+        <script>
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referralLink');
+            const message = document.getElementById('copyMessage');
+
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                message.textContent = '✅ Link copied to clipboard!';
+                message.style.opacity = '1';
+
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                }, 3000);
+            } catch (err) {
+                message.textContent = '❌ Failed to copy. Please copy manually.';
+                message.style.opacity = '1';
+            }
+        }
+        </script>
+
+        <h2 style="margin-bottom: 20px; color: #1e293b;" class="animate-slideInRight animate-delay-6">Quick Actions</h2>
         <div class="quick-actions">
-            <a href="training.php" class="action-btn">
+            <a href="training.php" class="action-btn animate-fadeInUp animate-delay-1">
                 <div class="icon">📚</div>
                 <div>Start Training</div>
             </a>
-            <a href="tasks.php" class="action-btn">
+            <a href="tasks.php" class="action-btn animate-fadeInUp animate-delay-2">
                 <div class="icon">✅</div>
                 <div>View Tasks</div>
             </a>
-            <a href="referrals.php" class="action-btn">
+            <a href="referrals.php" class="action-btn animate-fadeInUp animate-delay-3">
                 <div class="icon">👥</div>
                 <div>My Referrals</div>
             </a>
-            <a href="withdraw.php" class="action-btn">
+            <a href="withdraw.php" class="action-btn animate-fadeInUp animate-delay-4">
                 <div class="icon">💳</div>
                 <div>Withdraw</div>
             </a>
