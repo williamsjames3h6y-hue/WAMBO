@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Remove .php extension from URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Redirect to remove .php if present in URL
+RewriteCond %{THE_REQUEST} ^GET\ /[^?\s]+\.php
+RewriteRule ^(.*)\.php$ /$1 [R=301,L]
+
+# Set default character set
+AddDefaultCharset UTF-8
+
+# Enable error pages
+ErrorDocument 404 /index.php
