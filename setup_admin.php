@@ -155,9 +155,10 @@
                     <?php
                     try {
                         $stmt = $db->query("
-                            SELECT u.id, u.name, u.email, a.role, a.created_at as admin_since
+                            SELECT u.id, u.email, up.full_name, a.role, a.created_at as admin_since
                             FROM admin_users a
                             JOIN users u ON a.user_id = u.id
+                            LEFT JOIN user_profiles up ON u.id = up.id
                             ORDER BY a.created_at DESC
                         ");
                         $admins = $stmt->fetchAll();
@@ -166,14 +167,15 @@
                             echo '<p class="text-gray-400 text-center py-8">No admin users found</p>';
                         } else {
                             foreach ($admins as $admin) {
+                                $displayName = $admin['full_name'] ?: explode('@', $admin['email'])[0];
                                 echo '<div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600">';
                                 echo '<div class="flex justify-between items-start">';
                                 echo '<div class="flex-1">';
-                                echo '<p class="text-white font-semibold">' . htmlspecialchars($admin['name']) . '</p>';
+                                echo '<p class="text-white font-semibold">' . htmlspecialchars($displayName) . '</p>';
                                 echo '<p class="text-gray-400 text-sm">' . htmlspecialchars($admin['email']) . '</p>';
                                 echo '<p class="text-gray-500 text-xs mt-1">Admin since: ' . date('M d, Y', strtotime($admin['admin_since'])) . '</p>';
                                 echo '</div>';
-                                echo '<form method="POST" class="ml-4" onsubmit="return confirm(\'Remove admin privileges for ' . htmlspecialchars($admin['name']) . '?\')">';
+                                echo '<form method="POST" class="ml-4" onsubmit="return confirm(\'Remove admin privileges for ' . htmlspecialchars($displayName) . '?\')">';
                                 echo '<input type="hidden" name="action" value="remove_admin">';
                                 echo '<input type="hidden" name="user_id" value="' . htmlspecialchars($admin['id']) . '">';
                                 echo '<button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium">Remove</button>';
