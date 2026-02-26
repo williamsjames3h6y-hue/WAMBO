@@ -256,10 +256,10 @@ CREATE TABLE IF NOT EXISTS payment_gateways (
 -- ============================================
 INSERT INTO vip_tiers (name, level, price_monthly, max_annotations_per_month, max_projects, max_team_members, max_tasks_per_day, commission_rate, weekly_earning_limit, features, requires_support_contact) VALUES
 ('VIP 1', 1, 0.00, 100, 1, 1, 35, 0.50, 100.00, JSON_ARRAY('Basic annotation tools', 'Text data support', '35 tasks per day', 'Weekly limit $100+'), FALSE),
-('VIP 2', 2, 29.00, 1000, 5, 3, 50, 0.75, 500.00, JSON_ARRAY('All VIP 1 features', 'Image annotation', '50 tasks per day', 'Weekly limit $500+', 'Priority support'), FALSE),
-('VIP 3', 3, 79.00, 10000, 20, 10, 75, 1.00, 1000.00, JSON_ARRAY('All VIP 2 features', 'Video annotation', '75 tasks per day', 'Weekly limit $1000+', 'Advanced analytics'), FALSE),
-('VIP 4', 4, 199.00, 50000, 50, 25, 100, 1.25, 2000.00, JSON_ARRAY('All VIP 3 features', 'Audio annotation', '100 tasks per day', 'Weekly limit $2000+', 'API access'), FALSE),
-('VIP 5', 5, 499.00, 100000, 100, 50, 999999, 1.50, 5000.00, JSON_ARRAY('All VIP 4 features', 'Unlimited tasks per day', 'Weekly limit $5000+', 'Dedicated support', 'Custom workflows'), TRUE);
+('VIP 2', 2, 29.00, 1000, 5, 3, 50, 1.00, 500.00, JSON_ARRAY('All VIP 1 features', 'Image annotation', '50 tasks per day', 'Weekly limit $500+', 'Priority support'), FALSE),
+('VIP 3', 3, 79.00, 10000, 20, 10, 75, 2.30, 1000.00, JSON_ARRAY('All VIP 2 features', 'Video annotation', '75 tasks per day', 'Weekly limit $1000+', 'Advanced analytics'), FALSE),
+('VIP 4', 4, 199.00, 50000, 50, 25, 100, 4.00, 2000.00, JSON_ARRAY('All VIP 3 features', 'Audio annotation', '100 tasks per day', 'Weekly limit $2000+', 'API access'), FALSE),
+('VIP 5', 5, 499.00, 100000, 100, 50, 999999, 5.50, 5000.00, JSON_ARRAY('All VIP 4 features', 'Unlimited tasks per day', 'Weekly limit $5000+', 'Dedicated support', 'Custom workflows'), TRUE);
 
 -- ============================================
 -- Insert Sample Brand Identification Tasks for VIP 1 (35 tasks)
