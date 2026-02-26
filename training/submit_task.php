@@ -92,10 +92,26 @@ try {
 
     // If training account and completed 15 tasks, mark training as complete
     if ($userData && isset($userData['training_completed']) && !$userData['training_completed'] && $completedCount >= 15) {
+        // Mark the training account as complete
         $updateTrainingQuery = "UPDATE users SET training_completed = 1 WHERE id = :user_id";
         $updateTrainingStmt = $db->prepare($updateTrainingQuery);
         $updateTrainingStmt->bindParam(':user_id', $userId);
         $updateTrainingStmt->execute();
+
+        // Find and update the linked personal account
+        $findPersonalQuery = "SELECT id FROM users WHERE training_account_id = :training_id";
+        $findPersonalStmt = $db->prepare($findPersonalQuery);
+        $findPersonalStmt->bindParam(':training_id', $userId);
+        $findPersonalStmt->execute();
+        $personalAccount = $findPersonalStmt->fetch();
+
+        if ($personalAccount) {
+            // Mark personal account training as complete
+            $updatePersonalQuery = "UPDATE users SET training_completed = 1 WHERE id = :personal_id";
+            $updatePersonalStmt = $db->prepare($updatePersonalQuery);
+            $updatePersonalStmt->bindParam(':personal_id', $personalAccount['id']);
+            $updatePersonalStmt->execute();
+        }
 
         // Send Telegram notification
         try {
@@ -107,10 +123,16 @@ try {
             error_log("Telegram notification failed: " . $e->getMessage());
         }
 
-        // Redirect to main dashboard with success message
-        $_SESSION['training_complete'] = true;
-        $_SESSION['success'] = 'Congratulations! Training completed successfully. View Tasks is now unlocked!';
-        echo json_encode(['success' => true, 'redirect' => '/dashboard.php', 'training_complete' => true]);
+        // Logout training account
+        session_destroy();
+        session_start();
+
+        // Set success message for login page
+        $_SESSION['training_completed'] = true;
+        $_SESSION['success'] = 'Congratulations! Training completed successfully. Please login with your personal account to start earning!';
+
+        // Redirect to main login page
+        echo json_encode(['success' => true, 'redirect' => '/login.php?training_completed=1', 'training_complete' => true, 'message' => 'Training completed! Please login with your personal account.']);
         exit;
     }
 
