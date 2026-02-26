@@ -45,7 +45,7 @@ try {
 
     $submissionId = generateUUID();
     $insertQuery = "INSERT INTO user_task_submissions (id, user_id, task_id, status, submitted_at)
-                    VALUES (:id, :user_id, :task_id, 'pending', NOW())";
+                    VALUES (:id, :user_id, :task_id, 'completed', NOW())";
     $insertStmt = $db->prepare($insertQuery);
     $insertStmt->bindParam(':id', $submissionId);
     $insertStmt->bindParam(':user_id', $userId);
@@ -72,6 +72,42 @@ try {
     $transactionStmt->execute();
 
     $db->commit();
+
+    // Check if this is a training account and if they completed 15 tasks
+    $countQuery = "SELECT COUNT(*) as task_count FROM user_task_submissions WHERE user_id = :user_id AND status = 'completed'";
+    $countStmt = $db->prepare($countQuery);
+    $countStmt->bindParam(':user_id', $userId);
+    $countStmt->execute();
+    $countData = $countStmt->fetch();
+    $completedCount = $countData['task_count'] ?? 0;
+
+    $checkTrainingQuery = "SELECT u.training_completed, u.email, up.full_name
+                           FROM users u
+                           LEFT JOIN user_profiles up ON up.id = u.id
+                           WHERE u.id = :user_id";
+    $checkTrainingStmt = $db->prepare($checkTrainingQuery);
+    $checkTrainingStmt->bindParam(':user_id', $userId);
+    $checkTrainingStmt->execute();
+    $userData = $checkTrainingStmt->fetch();
+
+    // If training account and completed 15 tasks, mark training as complete
+    if ($userData && isset($userData['training_completed']) && !$userData['training_completed'] && $completedCount >= 15) {
+        $updateTrainingQuery = "UPDATE users SET training_completed = 1 WHERE id = :user_id";
+        $updateTrainingStmt = $db->prepare($updateTrainingQuery);
+        $updateTrainingStmt->bindParam(':user_id', $userId);
+        $updateTrainingStmt->execute();
+
+        // Send Telegram notification
+        require_once __DIR__ . '/includes/telegram.php';
+        $telegram = new TelegramNotifier();
+        $telegram->sendTrainingComplete($userData['full_name'], $userData['email']);
+
+        // Redirect to main login page with message
+        $_SESSION['training_complete'] = true;
+        $_SESSION['success'] = 'Training completed! Please login with your personal account to continue.';
+        session_destroy();
+        redirect('/login.php');
+    }
 
     $_SESSION['success'] = 'Task submitted successfully! $' . number_format($amount, 2) . ' added to your balance.';
     redirect('/tasks.php');

@@ -3,6 +3,13 @@ session_start();
 require_once 'config/database.php';
 
 $error = '';
+$success = '';
+
+// Check for training completion message
+if (isset($_SESSION['success'])) {
+    $success = $_SESSION['success'];
+    unset($_SESSION['success']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
@@ -324,6 +331,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-left: 4px solid #dc2626;
         }
 
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            border-left: 5px solid #10b981;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+            font-weight: 600;
+        }
+
         .links {
             text-align: center;
             margin-top: 30px;
@@ -453,6 +473,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if ($error): ?>
                 <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
 
             <form method="POST" action="">

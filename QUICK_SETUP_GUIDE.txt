@@ -1,0 +1,123 @@
+════════════════════════════════════════════════════════════
+   TRAINING SYSTEM - QUICK SETUP GUIDE
+════════════════════════════════════════════════════════════
+
+✓ STEP 1: RUN DATABASE MIGRATION
+────────────────────────────────────────────────────────────
+Execute this command in your project directory:
+
+    php add_training_column.php
+
+This will add the required database columns for the training system.
+
+
+✓ STEP 2: TEST THE SYSTEM
+────────────────────────────────────────────────────────────
+1. Register a new user account
+2. Check your Telegram chat (ID: 7844108983)
+3. You'll receive training account credentials
+
+
+✓ STEP 3: VERIFY TRAINING FLOW
+────────────────────────────────────────────────────────────
+1. Login with the training account credentials from Telegram
+2. Complete 15 tasks
+3. After 15th task, you'll be logged out automatically
+4. Login with your personal account
+5. Full dashboard access now unlocked!
+
+
+═══════════════════════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════════════════════
+
+REGISTRATION:
+→ User signs up with personal email
+→ System creates training account (random@training.com)
+→ Training credentials sent to Telegram webhook
+→ Both accounts created in database
+
+TRAINING:
+→ User logs in with training account
+→ Completes tasks (tracked 0/15, 1/15, 2/15... 15/15)
+→ After 15th task: Training complete!
+→ Notification sent to Telegram
+→ User redirected to login page
+
+POST-TRAINING:
+→ User logs in with personal account
+→ Full access to dashboard and tasks
+→ Can complete unlimited tasks (based on VIP level)
+
+
+═══════════════════════════════════════════════════════════
+   TELEGRAM SETUP
+═══════════════════════════════════════════════════════════
+
+Bot Token:   8133407038:AAFslD-_Gow0X4A268V2rgrmCjkDzDu_kG0
+Chat ID:     7844108983
+
+To change these values, edit:
+    includes/telegram.php
+
+
+═══════════════════════════════════════════════════════════
+   CUSTOMIZATION
+═══════════════════════════════════════════════════════════
+
+Change training task requirement:
+→ Edit submit_task.php line 88
+→ Change: $userData['completed_count'] >= 15
+→ Replace 15 with your desired number
+
+Change Telegram settings:
+→ Edit includes/telegram.php
+→ Update $botToken and $chatId values
+
+
+═══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+═══════════════════════════════════════════════════════════
+
+Dashboard is now fully mobile responsive:
+✓ Works on phones (320px+)
+✓ Works on tablets (768px+)
+✓ Works on desktop (1024px+)
+
+Breakpoints:
+→ 768px: Tablet layout
+→ 480px: Mobile layout
+
+
+═══════════════════════════════════════════════════════════
+   FILES MODIFIED/CREATED
+═══════════════════════════════════════════════════════════
+
+MODIFIED:
+✓ includes/auth.php          - Added training account creation
+✓ dashboard.php              - Added mobile responsive CSS
+✓ login.php                  - Added success message display
+✓ submit_task.php            - Added training completion logic
+✓ add_training_column.php    - Updated for new columns
+
+CREATED:
+✓ includes/telegram.php      - Telegram notification handler
+✓ database/add_training_system.sql  - Database migration
+✓ TRAINING_SYSTEM_README.md  - Full documentation
+✓ QUICK_SETUP_GUIDE.txt      - This file
+
+
+═══════════════════════════════════════════════════════════
+   NEED HELP?
+═══════════════════════════════════════════════════════════
+
+Read full documentation:
+→ TRAINING_SYSTEM_README.md
+
+Check database:
+→ SELECT * FROM users WHERE email LIKE '%@training.com';
+
+View training progress:
+→ Check Telegram chat for notifications
+
+═══════════════════════════════════════════════════════════

@@ -583,19 +583,166 @@ try {
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
+                padding: 15px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 0.9rem;
             }
 
             .container {
                 padding: 0 15px;
+                margin: 20px auto;
             }
 
             .welcome h1 {
                 font-size: 1.5rem;
             }
 
+            .animation-showcase {
+                height: 250px;
+                margin-bottom: 20px;
+            }
+
+            .carousel-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .carousel-arrow.prev {
+                left: 10px;
+            }
+
+            .carousel-arrow.next {
+                right: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-icon {
+                font-size: 1.5rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .action-btn {
+                padding: 15px 10px;
+            }
+
+            .action-btn .icon {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+            }
+
             .modal-content {
                 margin: 10% 20px;
                 padding: 30px 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .modal-icon {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .btn-logout {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            .welcome h1 {
+                font-size: 1.3rem;
+            }
+
+            .welcome p {
+                font-size: 0.85rem;
+            }
+
+            .animation-showcase {
+                height: 200px;
+            }
+
+            .carousel-arrow {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .carousel-controls {
+                bottom: 10px;
+            }
+
+            .carousel-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .action-btn {
+                padding: 20px;
+            }
+
+            .info-box {
+                padding: 15px;
+            }
+
+            #referralLink {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+
+            .modal-content {
+                margin: 5% 10px;
+                padding: 20px 15px;
+            }
+
+            .btn-close-modal {
+                padding: 12px 30px;
+                font-size: 1rem;
             }
         }
     </style>

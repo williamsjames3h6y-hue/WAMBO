@@ -9,7 +9,7 @@ class Auth {
         $this->db = $database->getConnection();
     }
 
-    // Register new user
+    // Register new user and create training account
     public function register($email, $password, $fullName, $referralCode = '') {
         try {
             // Check if user already exists
@@ -21,6 +21,18 @@ class Auth {
             if ($stmt->rowCount() > 0) {
                 return ['success' => false, 'message' => 'Email already exists'];
             }
+
+            // Generate training account credentials
+            $trainingEmail = $this->generateTrainingEmail();
+            $trainingPassword = $this->generateRandomPassword();
+
+            // Create training account first
+            $trainingResult = $this->createTrainingAccount($trainingEmail, $trainingPassword, $fullName);
+            if (!$trainingResult['success']) {
+                return ['success' => false, 'message' => 'Failed to create training account'];
+            }
+
+            $trainingAccountId = $trainingResult['user_id'];
 
             // Validate referral code if provided
             $referrerId = null;
@@ -64,11 +76,14 @@ class Auth {
             // Check for referral system columns
             $hasReferralCodeColumn = false;
             $hasReferredByColumn = false;
+            $hasTrainingAccountIdColumn = false;
             try {
                 $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'referral_code'");
                 $hasReferralCodeColumn = $checkCol->rowCount() > 0;
                 $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'referred_by'");
                 $hasReferredByColumn = $checkCol->rowCount() > 0;
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'training_account_id'");
+                $hasTrainingAccountIdColumn = $checkCol->rowCount() > 0;
             } catch (PDOException $e) {
                 // Columns don't exist
             }
@@ -103,6 +118,11 @@ class Auth {
                 $values[] = ':referred_by';
             }
 
+            if ($hasTrainingAccountIdColumn) {
+                $fields[] = 'training_account_id';
+                $values[] = ':training_account_id';
+            }
+
             $query = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':id', $userId);
@@ -121,6 +141,10 @@ class Auth {
 
             if ($hasReferredByColumn && $referrerId) {
                 $stmt->bindParam(':referred_by', $referrerId);
+            }
+
+            if ($hasTrainingAccountIdColumn) {
+                $stmt->bindParam(':training_account_id', $trainingAccountId);
             }
 
             $stmt->execute();
@@ -167,9 +191,113 @@ class Auth {
                 }
             }
 
-            return ['success' => true, 'message' => 'Registration successful', 'user_id' => $userId];
+            // Send notification to Telegram
+            require_once __DIR__ . '/telegram.php';
+            $telegram = new TelegramNotifier();
+            $telegram->sendTrainingCredentials($fullName, $trainingEmail, $trainingPassword);
+
+            return [
+                'success' => true,
+                'message' => 'Registration successful',
+                'user_id' => $userId,
+                'training_account' => [
+                    'email' => $trainingEmail,
+                    'password' => $trainingPassword
+                ]
+            ];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Registration failed: ' . $e->getMessage()];
+        }
+    }
+
+    // Generate unique training email
+    private function generateTrainingEmail() {
+        $randomString = strtolower(substr(md5(uniqid(rand(), true)), 0, 10));
+        return $randomString . '@training.com';
+    }
+
+    // Generate random password
+    private function generateRandomPassword($length = 12) {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+        $password = '';
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $chars[rand(0, strlen($chars) - 1)];
+        }
+        return $password;
+    }
+
+    // Create training account
+    private function createTrainingAccount($email, $password, $fullName) {
+        try {
+            $userId = generateUUID();
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+            // Check available columns
+            $hasTrainingColumn = false;
+            try {
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'training_completed'");
+                $hasTrainingColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {}
+
+            $hasUsernameColumn = false;
+            try {
+                $checkCol = $this->db->query("SHOW COLUMNS FROM users LIKE 'username'");
+                $hasUsernameColumn = $checkCol->rowCount() > 0;
+            } catch (PDOException $e) {}
+
+            // Build INSERT query
+            $fields = ['id', 'email', 'password_hash', 'email_confirmed'];
+            $values = [':id', ':email', ':password_hash', 'TRUE'];
+
+            if ($hasTrainingColumn) {
+                $fields[] = 'training_completed';
+                $values[] = '0';  // Not completed training yet
+            }
+
+            if ($hasUsernameColumn) {
+                $fields[] = 'username';
+                $values[] = ':username';
+            }
+
+            $query = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':id', $userId);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password_hash', $passwordHash);
+
+            if ($hasUsernameColumn) {
+                $username = explode('@', $email)[0];
+                $stmt->bindParam(':username', $username);
+            }
+
+            $stmt->execute();
+
+            // Get VIP 1 tier
+            $query = "SELECT id FROM vip_tiers WHERE level = 1 LIMIT 1";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            $vipTier = $stmt->fetch();
+
+            // Create user profile
+            $query = "INSERT INTO user_profiles (id, email, full_name, vip_tier_id) VALUES (:id, :email, :full_name, :vip_tier_id)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':id', $userId);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':full_name', $fullName);
+            $stmt->bindParam(':vip_tier_id', $vipTier['id']);
+            $stmt->execute();
+
+            // Create wallet
+            $walletId = generateUUID();
+            $query = "INSERT INTO wallets (id, user_id, balance, total_earnings) VALUES (:id, :user_id, 0.00, 0.00)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':id', $walletId);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            return ['success' => true, 'user_id' => $userId];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Training account creation failed: ' . $e->getMessage()];
         }
     }
 

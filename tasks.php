@@ -49,7 +49,7 @@ if (!$userProfile) {
 $vipLevel = $userProfile['vip_level'] ?? 1;
 $balance = $userProfile['balance'] ?? 0;
 $fullName = $userProfile['full_name'] ?? 'User';
-$isTrainingAccount = !($userProfile['training_completed'] ?? false);
+$isTrainingAccount = isset($userProfile['training_completed']) && !$userProfile['training_completed'];
 $taskLimit = $userProfile['daily_task_limit'] ?? $userProfile['max_tasks_per_day'] ?? 35;
 
 $tasksQuery = "SELECT * FROM tasks WHERE status = 'active' ORDER BY created_at DESC LIMIT 20";
@@ -191,6 +191,37 @@ $earningsToday = $earningsData['earnings'] ?? 0;
             margin-top: 8px;
         }
 
+        .training-progress {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 5px;
+            text-align: center;
+        }
+
         .task-card {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 16px;
@@ -273,8 +304,24 @@ $earningsToday = $earningsData['earnings'] ?? 0;
         }
 
         @media (max-width: 768px) {
-            .stats-header {
+            .header {
+                flex-direction: column;
                 gap: 15px;
+                padding: 15px;
+                align-items: stretch;
+            }
+
+            .back-btn {
+                font-size: 0.95rem;
+            }
+
+            .stats-header {
+                gap: 20px;
+                justify-content: center;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
             }
 
             .stat-value {
@@ -284,10 +331,146 @@ $earningsToday = $earningsData['earnings'] ?? 0;
             .vip-section {
                 flex-direction: column;
                 padding: 20px;
+                gap: 15px;
+            }
+
+            .vip-info h2 {
+                font-size: 1.3rem;
+            }
+
+            .vip-info p {
+                font-size: 0.85rem;
+            }
+
+            .training-progress {
+                padding: 10px;
             }
 
             .container {
                 padding: 20px 15px;
+            }
+
+            .task-card {
+                padding: 15px;
+            }
+
+            .task-image {
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .task-id {
+                font-size: 1.1rem;
+            }
+
+            .task-profit {
+                font-size: 1rem;
+            }
+
+            .submit-btn {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px;
+            }
+
+            .back-btn {
+                font-size: 0.9rem;
+            }
+
+            .stats-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 8px 12px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+                text-align: left;
+                margin-bottom: 0;
+            }
+
+            .stat-value {
+                font-size: 0.95rem;
+            }
+
+            .vip-section {
+                padding: 15px;
+            }
+
+            .vip-info h2 {
+                font-size: 1.1rem;
+            }
+
+            .vip-info p {
+                font-size: 0.8rem;
+            }
+
+            .training-badge {
+                font-size: 0.75rem;
+                padding: 5px 12px;
+            }
+
+            .training-progress {
+                padding: 8px;
+                margin-top: 10px;
+            }
+
+            .progress-text {
+                font-size: 0.75rem;
+            }
+
+            .container {
+                padding: 15px 10px;
+            }
+
+            .task-card {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .task-image {
+                height: 200px;
+                margin: 15px auto;
+            }
+
+            .task-id {
+                font-size: 1rem;
+                margin: 12px 0;
+            }
+
+            .task-profit {
+                font-size: 0.95rem;
+            }
+
+            .submit-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .no-tasks {
+                padding: 40px 15px;
+            }
+
+            .no-tasks-icon {
+                font-size: 3rem;
+            }
+
+            .no-tasks h2 {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -321,6 +504,24 @@ $earningsToday = $earningsData['earnings'] ?? 0;
                     <div class="training-badge">
                         <span>🎓</span>
                         <span>TRAINING ACCOUNT</span>
+                    </div>
+                    <div class="training-progress">
+                        <div style="font-weight: 600; font-size: 0.9rem; color: white; margin-bottom: 6px;">
+                            Training Progress: <?php echo $tasksCompleted; ?>/15 tasks
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: <?php echo min(100, ($tasksCompleted / 15) * 100); ?>%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <?php
+                            $remaining = 15 - $tasksCompleted;
+                            if ($remaining > 0) {
+                                echo $remaining . " more task" . ($remaining != 1 ? "s" : "") . " to unlock main dashboard";
+                            } else {
+                                echo "Training complete! Finish current task to proceed.";
+                            }
+                            ?>
+                        </div>
                     </div>
                 <?php endif; ?>
                 <p style="margin-top: 8px; font-size: 0.9rem;">Daily Limit: <?php echo $taskLimit > 1000 ? 'Unlimited' : $taskLimit; ?> tasks</p>
