@@ -34,6 +34,7 @@ try {
     $totalEarnings = $user['total_earnings'] ?? 0;
     $referralCode = $user['referral_code'] ?? null;
     $trainingCompleted = isset($user['training_completed']) ? (bool)$user['training_completed'] : false;
+    $isTrainingAccount = strpos($user['email'], '@training.earningsllc.com') !== false;
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
@@ -93,7 +94,7 @@ unset($_SESSION['success']);
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
             min-height: 100vh;
             padding-bottom: 100px;
         }
@@ -184,18 +185,15 @@ unset($_SESSION['success']);
         }
 
         .hero-banner {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             border-radius: 16px;
-            padding: 40px;
+            padding: 40px 40px 30px 40px;
             color: white;
             margin-bottom: 32px;
             min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.4);
         }
 
         .hero-banner::before {
@@ -205,7 +203,7 @@ unset($_SESSION['success']);
             right: -10%;
             width: 300px;
             height: 300px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
         }
 
@@ -216,8 +214,69 @@ unset($_SESSION['success']);
             left: -5%;
             width: 250px;
             height: 250px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 50%;
+        }
+
+        .ai-logos {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            opacity: 0.15;
+        }
+
+        .ai-logo {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .ai-logo:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .ai-logo:nth-child(2) {
+            top: 60%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        .ai-logo:nth-child(3) {
+            top: 20%;
+            right: 8%;
+            animation-delay: 4s;
+        }
+
+        .ai-logo:nth-child(4) {
+            bottom: 15%;
+            right: 5%;
+            animation-delay: 1s;
+        }
+
+        .ai-logo:nth-child(5) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.15;
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+                opacity: 0.25;
+            }
         }
 
         .hero-content {
@@ -345,6 +404,48 @@ unset($_SESSION['success']);
 
         .copy-btn:hover {
             background: #0891b2;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-action-btn {
+            background: rgba(59, 130, 246, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-action-btn:hover {
+            background: rgba(59, 130, 246, 1);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-action-btn .icon {
+            font-size: 32px;
+        }
+
+        .hero-action-btn .label {
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
         }
 
         .quick-actions {
@@ -483,9 +584,66 @@ unset($_SESSION['success']);
         <?php endif; ?>
 
         <div class="hero-banner">
+            <div class="ai-logos">
+                <img src="/public/AI.jpg" alt="AI" class="ai-logo">
+                <img src="/public/AI2.jpg" alt="AI" class="ai-logo">
+                <img src="/public/AI3.jpg" alt="AI" class="ai-logo">
+                <img src="/public/AI4.jpg" alt="AI" class="ai-logo">
+                <img src="/public/AI5.jpg" alt="AI" class="ai-logo">
+            </div>
             <div class="hero-content">
-                <h1>Welcome back, <?php echo htmlspecialchars($fullName); ?>!</h1>
-                <p style="font-size: 1.1rem; opacity: 0.95;">Start earning by completing tasks today</p>
+                <h1>Welcome, <?php echo htmlspecialchars($fullName); ?>! 👋</h1>
+                <p style="font-size: 1rem; opacity: 0.95; margin-bottom: 4px;">Your VIP Level: <?php echo $user['vip_level'] ?? 1; ?> | Balance: $<?php echo number_format($balance, 2); ?></p>
+                <p style="font-size: 0.9rem; opacity: 0.85;">Daily Limit: 35 tasks</p>
+
+                <div class="hero-actions">
+                    <a href="#" class="hero-action-btn">
+                        <div class="icon">⚙️</div>
+                        <div class="label">Customer<br>Care</div>
+                    </a>
+                    <a href="/profile.php" class="hero-action-btn">
+                        <div class="icon">🎯</div>
+                        <div class="label">Affiliate</div>
+                    </a>
+                    <a href="/payment_methods.php" class="hero-action-btn">
+                        <div class="icon">💳</div>
+                        <div class="label">Payment<br>Method</div>
+                    </a>
+                    <a href="#" class="hero-action-btn">
+                        <div class="icon">❓</div>
+                        <div class="label">FAQ</div>
+                    </a>
+                    <a href="#" class="hero-action-btn">
+                        <div class="icon">ℹ️</div>
+                        <div class="label">About Us</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 32px;">
+            <h2 style="color: white; margin-bottom: 16px;">Membership Level</h2>
+            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <a href="/dashboard.php" class="action-card" style="max-width: 140px;">
+                    <div class="action-icon">🏠</div>
+                    <div class="action-label">Home</div>
+                </a>
+                <a href="#" onclick="handleStartTraining(); return false;" class="action-card" style="max-width: 140px;">
+                    <div class="action-icon">📚</div>
+                    <div class="action-label">Start Training</div>
+                </a>
+                <a href="/tasks.php" class="action-card <?php echo !$trainingCompleted ? 'locked' : ''; ?>" style="max-width: 140px;" <?php echo !$trainingCompleted ? 'onclick="return false;"' : ''; ?>>
+                    <div class="action-icon">📊</div>
+                    <div class="action-label">Start Tasks</div>
+                </a>
+                <a href="/payment_methods.php" class="action-card" style="max-width: 140px;">
+                    <div class="action-icon">💰</div>
+                    <div class="action-label">Wallet</div>
+                </a>
+                <a href="/profile.php" class="action-card" style="max-width: 140px;">
+                    <div class="action-icon">📝</div>
+                    <div class="action-label">Record</div>
+                </a>
             </div>
         </div>
 
@@ -529,28 +687,6 @@ unset($_SESSION['success']);
             </div>
         </div>
 
-        <h2 style="margin-bottom: 16px; color: #0f172a;">Quick Actions</h2>
-        <div class="quick-actions">
-            <a href="/training/tasks.php" class="action-card">
-                <div class="action-icon">📚</div>
-                <div class="action-label">Start Training</div>
-            </a>
-
-            <a href="<?php echo $trainingCompleted ? '/tasks.php' : '#'; ?>" class="action-card <?php echo !$trainingCompleted ? 'locked' : ''; ?>" <?php echo !$trainingCompleted ? 'onclick="return false;"' : ''; ?>>
-                <div class="action-icon">✅</div>
-                <div class="action-label">View Tasks</div>
-            </a>
-
-            <a href="/profile.php" class="action-card">
-                <div class="action-icon">👥</div>
-                <div class="action-label">My Referrals</div>
-            </a>
-
-            <a href="/payment_methods.php" class="action-card">
-                <div class="action-icon">💳</div>
-                <div class="action-label">Withdraw</div>
-            </a>
-        </div>
 
         <?php if (count($referrals) > 0): ?>
             <div class="referral-section">
@@ -577,6 +713,20 @@ unset($_SESSION['success']);
     </div>
 
     <script>
+        const isTrainingAccount = <?php echo $isTrainingAccount ? 'true' : 'false'; ?>;
+
+        function handleStartTraining() {
+            if (isTrainingAccount) {
+                // Already logged into training account, go to training tasks
+                window.location.href = '/training/tasks.php';
+            } else {
+                // Not training account, redirect to training login
+                if (confirm('You need to login with your training account to access training tasks. Go to training login?')) {
+                    window.location.href = '/training/login.php';
+                }
+            }
+        }
+
         function copyReferralLink() {
             const input = document.getElementById('referralLink');
             input.select();
