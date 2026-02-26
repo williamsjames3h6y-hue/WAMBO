@@ -431,12 +431,35 @@ try {
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            cursor: pointer;
         }
 
         .action-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             border-color: #3b82f6;
+        }
+
+        .action-btn.disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .action-btn.disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-color: transparent;
+        }
+
+        .action-btn.disabled::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
         }
 
         .action-btn .icon {
@@ -697,10 +720,17 @@ try {
                 <div class="icon">📚</div>
                 <div>Start Training</div>
             </a>
-            <a href="tasks.php" class="action-btn animate-fadeInUp animate-delay-2">
-                <div class="icon">✅</div>
-                <div>View Tasks</div>
-            </a>
+            <?php if ($user['training_completed']): ?>
+                <a href="tasks.php" class="action-btn animate-fadeInUp animate-delay-2">
+                    <div class="icon">✅</div>
+                    <div>View Tasks</div>
+                </a>
+            <?php else: ?>
+                <a href="#" onclick="showTrainingRequiredModal(); return false;" class="action-btn disabled animate-fadeInUp animate-delay-2">
+                    <div class="icon">✅</div>
+                    <div>View Tasks</div>
+                </a>
+            <?php endif; ?>
             <a href="referrals.php" class="action-btn animate-fadeInUp animate-delay-3">
                 <div class="icon">👥</div>
                 <div>My Referrals</div>
@@ -731,6 +761,35 @@ try {
             </div>
             <div class="modal-footer">
                 <button class="btn-close-modal" onclick="closeAndRedirect()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Required Modal -->
+    <div id="trainingRequiredModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🔒</div>
+                <h2>Training Required</h2>
+            </div>
+            <div class="modal-body">
+                <p style="color: #dc2626; font-size: 1.2rem; font-weight: 600; text-align: center; margin-bottom: 20px;">
+                    COMPLETE YOUR TRAINING TO START EARNING
+                </p>
+
+                <div class="highlight-box" style="background: #fee2e2; border-left-color: #dc2626;">
+                    <p style="color: #7f1d1d;">You must complete your training before you can access tasks and start earning. Contact your instructor to begin your training journey!</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 20px;">Once you complete your training, you'll unlock:</p>
+                <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                    <li style="padding: 8px 0; color: #065f46;">✓ Access to all earning tasks</li>
+                    <li style="padding: 8px 0; color: #065f46;">✓ Higher earning potential</li>
+                    <li style="padding: 8px 0; color: #065f46;">✓ Advanced features and tools</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close-modal" onclick="closeTrainingRequiredModal()">UNDERSTOOD</button>
             </div>
         </div>
     </div>
@@ -783,11 +842,25 @@ try {
             window.location.href = 'logout.php?redirect=/TRAINING/login.php';
         }
 
+        // Training Required modal functions
+        function showTrainingRequiredModal() {
+            document.getElementById('trainingRequiredModal').style.display = 'block';
+        }
+
+        function closeTrainingRequiredModal() {
+            document.getElementById('trainingRequiredModal').style.display = 'none';
+        }
+
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('trainingModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            const trainingModal = document.getElementById('trainingModal');
+            const trainingRequiredModal = document.getElementById('trainingRequiredModal');
+
+            if (event.target == trainingModal) {
+                trainingModal.style.display = 'none';
+            }
+            if (event.target == trainingRequiredModal) {
+                trainingRequiredModal.style.display = 'none';
             }
         }
     </script>
