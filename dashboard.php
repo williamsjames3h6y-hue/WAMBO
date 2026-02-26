@@ -128,6 +128,22 @@ try {
             min-height: 100vh;
         }
 
+        .training-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            margin-left: 10px;
+        }
+
         .header {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             color: white;
@@ -312,7 +328,14 @@ try {
     <div class="header">
         <div class="logo">💰 EarningsLLC</div>
         <div class="user-info">
-            <span>Welcome, <?php echo htmlspecialchars($user['username']); ?>!</span>
+            <span>Welcome, <?php echo htmlspecialchars($user['username']); ?>!
+            <?php if (!$user['training_completed']): ?>
+                <span class="training-badge">
+                    <span>🎓</span>
+                    <span>TRAINING</span>
+                </span>
+            <?php endif; ?>
+            </span>
             <a href="logout.php" class="btn-logout">Logout</a>
         </div>
     </div>

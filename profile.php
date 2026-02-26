@@ -279,7 +279,12 @@ $totalReferrals = $referralData['total'] ?? 0;
                 <div class="benefit-icon">📋</div>
                 <div class="benefit-text">
                     <div class="benefit-label">Daily Task Limit</div>
-                    <div class="benefit-value"><?php echo $profile['daily_task_limit'] ?? 40; ?> tasks/day</div>
+                    <div class="benefit-value">
+                        <?php
+                        $taskLimit = $profile['daily_task_limit'] ?? 35;
+                        echo $taskLimit > 1000 ? 'Unlimited' : $taskLimit;
+                        ?> tasks/day
+                    </div>
                 </div>
             </div>
 

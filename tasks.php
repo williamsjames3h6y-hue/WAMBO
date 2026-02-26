@@ -11,10 +11,11 @@ $db = $database->getConnection();
 
 $userId = $_SESSION['user_id'];
 
-$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, w.balance
+$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.daily_task_limit, vt.max_tasks_per_day, w.balance, u.training_completed
           FROM user_profiles up
           LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
           LEFT JOIN wallets w ON w.user_id = up.id
+          LEFT JOIN users u ON u.id = up.id
           WHERE up.id = :user_id";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $userId);
@@ -28,6 +29,8 @@ if (!$userProfile) {
 $vipLevel = $userProfile['vip_level'] ?? 1;
 $balance = $userProfile['balance'] ?? 0;
 $fullName = $userProfile['full_name'] ?? 'User';
+$isTrainingAccount = !($userProfile['training_completed'] ?? false);
+$taskLimit = $userProfile['daily_task_limit'] ?? $userProfile['max_tasks_per_day'] ?? 35;
 
 $tasksQuery = "SELECT * FROM tasks WHERE status = 'active' ORDER BY created_at DESC LIMIT 20";
 $tasksStmt = $db->prepare($tasksQuery);
@@ -152,6 +155,22 @@ $earningsToday = $earningsData['earnings'] ?? 0;
             font-size: 0.95rem;
         }
 
+        .training-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+        }
+
         .task-card {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 16px;
@@ -263,7 +282,7 @@ $earningsToday = $earningsData['earnings'] ?? 0;
         <div class="stats-header">
             <div class="stat-item">
                 <div class="stat-label">Tasks Completed</div>
-                <div class="stat-value"><?php echo $tasksCompleted; ?> / 40</div>
+                <div class="stat-value"><?php echo $tasksCompleted; ?> / <?php echo $taskLimit > 1000 ? 'Unlimited' : $taskLimit; ?></div>
             </div>
             <div class="stat-item">
                 <div class="stat-label">Earnings Today</div>
@@ -278,6 +297,13 @@ $earningsToday = $earningsData['earnings'] ?? 0;
             <div class="vip-info">
                 <h2>Welcome, <?php echo htmlspecialchars($fullName); ?></h2>
                 <p>Your VIP Level: <?php echo $vipLevel; ?> | Balance: $<?php echo number_format($balance, 2); ?></p>
+                <?php if ($isTrainingAccount): ?>
+                    <div class="training-badge">
+                        <span>🎓</span>
+                        <span>TRAINING ACCOUNT</span>
+                    </div>
+                <?php endif; ?>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Daily Limit: <?php echo $taskLimit > 1000 ? 'Unlimited' : $taskLimit; ?> tasks</p>
             </div>
         </div>
 
