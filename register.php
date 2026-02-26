@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow-x: hidden;
             overflow-y: auto;
             position: relative;
-            padding: 20px 0;
+            padding: 30px 15px;
         }
 
         body::before {
@@ -245,9 +245,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .image-content h2 {
-            font-size: 2.8rem;
+            font-size: 1.9rem;
             font-weight: 800;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             animation: pulse 4s ease-in-out infinite;
             background: linear-gradient(to right, #fff, #e0e7ff);
@@ -257,8 +257,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .image-content p {
-            font-size: 1.15rem;
-            line-height: 1.8;
+            font-size: 0.95rem;
+            line-height: 1.6;
             opacity: 0.95;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
@@ -271,13 +271,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .feature-item {
             display: flex;
             align-items: center;
-            gap: 18px;
-            margin-bottom: 20px;
-            font-size: 1.05rem;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
             animation: fadeIn 1.5s ease-out;
             backdrop-filter: blur(10px);
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: 12px;
             transition: all 0.3s ease;
         }
@@ -300,29 +300,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .logo {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #1e293b;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             animation: slideInLeft 0.6s ease-out;
             display: flex;
             align-items: center;
             gap: 8px;
+            justify-content: center;
         }
 
         h1 {
-            font-size: 1.9rem;
+            font-size: 1.5rem;
             color: #1e293b;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 800;
             animation: slideInLeft 0.7s ease-out;
+            text-align: center;
         }
 
         .subtitle {
             color: #64748b;
-            margin-bottom: 35px;
-            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
             animation: slideInLeft 0.8s ease-out;
+            text-align: center;
         }
 
         .form-group {

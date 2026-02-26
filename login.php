@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow-x: hidden;
             overflow-y: auto;
             position: relative;
-            padding: 20px 0;
+            padding: 30px 15px;
         }
 
         body::before {
@@ -190,9 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .image-content h2 {
-            font-size: 2.8rem;
+            font-size: 1.9rem;
             font-weight: 800;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             animation: pulse 4s ease-in-out infinite;
         }
@@ -203,30 +203,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .image-content p {
-            font-size: 1.15rem;
-            line-height: 1.8;
+            font-size: 0.95rem;
+            line-height: 1.6;
             opacity: 0.95;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #1e293b;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 700;
+            text-align: center;
         }
 
         .subtitle {
             color: #64748b;
-            margin-bottom: 40px;
-            font-size: 0.95rem;
+            margin-bottom: 30px;
+            font-size: 0.85rem;
+            text-align: center;
         }
 
         .form-group {
@@ -375,11 +378,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             .image-content h2 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
             }
 
             h1 {
-                font-size: 1.6rem;
+                font-size: 1.3rem;
             }
 
             body {
@@ -419,15 +422,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             .logo {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
             h1 {
-                font-size: 1.4rem;
+                font-size: 1.2rem;
             }
 
             .subtitle {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
+            }
+
+            .image-content h2 {
+                font-size: 1.3rem;
+            }
+
+            .image-content p {
+                font-size: 0.85rem;
             }
         }
     </style>
