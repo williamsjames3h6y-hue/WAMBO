@@ -277,6 +277,71 @@ try {
         .animate-delay-5 { animation-delay: 0.5s; }
         .animate-delay-6 { animation-delay: 0.6s; }
 
+        .ai-slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+        }
+
+        .ai-slideshow {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ai-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            animation: ai-fade 20s infinite;
+            object-fit: cover;
+        }
+
+        .ai-slide:nth-child(1) { animation-delay: 0s; }
+        .ai-slide:nth-child(2) { animation-delay: 4s; }
+        .ai-slide:nth-child(3) { animation-delay: 8s; }
+        .ai-slide:nth-child(4) { animation-delay: 12s; }
+        .ai-slide:nth-child(5) { animation-delay: 16s; }
+
+        @keyframes ai-fade {
+            0% { opacity: 0; transform: scale(1.05); }
+            5% { opacity: 1; transform: scale(1); }
+            20% { opacity: 1; transform: scale(1); }
+            25% { opacity: 0; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.05); }
+        }
+
+        .slideshow-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+            padding: 30px;
+            color: white;
+            z-index: 10;
+        }
+
+        .slideshow-overlay h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .slideshow-overlay p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
         .stat-icon {
             font-size: 2rem;
             margin-bottom: 15px;
@@ -403,21 +468,30 @@ try {
             <p>Track your earnings, referrals, and training progress</p>
         </div>
 
+        <div class="ai-slideshow-container animate-fadeInUp animate-delay-1">
+            <div class="ai-slideshow">
+                <img src="/public/AI.jpg" alt="AI Technology" class="ai-slide">
+                <img src="/public/AI2.jpg" alt="AI Innovation" class="ai-slide">
+                <img src="/public/AI3.jpg" alt="AI Solutions" class="ai-slide">
+                <img src="/public/AI4.jpg" alt="AI Future" class="ai-slide">
+                <img src="/public/AI5.jpg" alt="AI Platform" class="ai-slide">
+            </div>
+        </div>
 
         <div class="stats-grid">
-            <div class="stat-card animate-fadeInUp animate-delay-1">
+            <div class="stat-card animate-fadeInUp animate-delay-2">
                 <div class="stat-icon">💵</div>
                 <div class="stat-label">Account Balance</div>
                 <div class="stat-value success">$<?php echo number_format($user['balance'], 2); ?></div>
             </div>
 
-            <div class="stat-card animate-fadeInUp animate-delay-2">
+            <div class="stat-card animate-fadeInUp animate-delay-3">
                 <div class="stat-icon">🎓</div>
                 <div class="stat-label">Training Earnings</div>
                 <div class="stat-value success">$<?php echo number_format($trainingEarnings, 2); ?></div>
             </div>
 
-            <div class="stat-card animate-fadeInUp animate-delay-3">
+            <div class="stat-card animate-fadeInUp animate-delay-4">
                 <div class="stat-icon">👥</div>
                 <div class="stat-label">Total Referrals</div>
                 <div class="stat-value"><?php echo $totalReferrals; ?></div>
@@ -429,10 +503,7 @@ try {
                 <?php
                 $referralLink = 'https://' . $_SERVER['HTTP_HOST'] . '/register.php?ref=' . urlencode($user['referral_code']);
                 ?>
-                <p style="margin-bottom: 15px;"><strong style="color: #065f46;">Your Referral Code:</strong> <span style="font-size: 1.3em; color: #10b981; font-weight: bold; font-family: 'Courier New', monospace;"><?php echo htmlspecialchars($user['referral_code']); ?></span></p>
-
-                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #10b981;">
-                    <p style="margin-bottom: 8px; color: #065f46; font-weight: 600;">Your Referral Link:</p>
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 2px dashed #10b981;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" id="referralLink" value="<?php echo htmlspecialchars($referralLink); ?>" readonly style="flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9em; background: #f9fafb; color: #374151;">
                         <button onclick="copyReferralLink()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s ease;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
@@ -441,8 +512,6 @@ try {
                     </div>
                     <p id="copyMessage" style="color: #10b981; margin-top: 8px; font-size: 0.85em; font-weight: 600; opacity: 0; transition: opacity 0.3s ease;"></p>
                 </div>
-
-                <p style="margin-top: 10px; color: #065f46;">Share this link with friends to earn commissions on their earnings!</p>
             <?php else: ?>
                 <p><strong>Referral System Not Set Up</strong></p>
                 <p style="margin-top: 10px;">

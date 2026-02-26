@@ -20,8 +20,18 @@ try {
     $hasTaskLimit = false;
 }
 
+// Check if training_completed column exists
+$hasTrainingColumn = false;
+try {
+    $checkCol = $db->query("SHOW COLUMNS FROM users LIKE 'training_completed'");
+    $hasTrainingColumn = $checkCol->rowCount() > 0;
+} catch (PDOException $e) {
+    $hasTrainingColumn = false;
+}
+
 $taskLimitField = $hasTaskLimit ? ', vt.daily_task_limit' : '';
-$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance, u.training_completed
+$trainingField = $hasTrainingColumn ? ', u.training_completed' : '';
+$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance{$trainingField}
           FROM user_profiles up
           LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
           LEFT JOIN wallets w ON w.user_id = up.id
@@ -39,7 +49,7 @@ if (!$userProfile) {
 $vipLevel = $userProfile['vip_level'] ?? 1;
 $balance = $userProfile['balance'] ?? 0;
 $fullName = $userProfile['full_name'] ?? 'User';
-$isTrainingAccount = !($userProfile['training_completed'] ?? false);
+$isTrainingAccount = $hasTrainingColumn ? !($userProfile['training_completed'] ?? false) : false;
 $taskLimit = $userProfile['daily_task_limit'] ?? $userProfile['max_tasks_per_day'] ?? 35;
 
 $tasksQuery = "SELECT * FROM tasks WHERE status = 'active' ORDER BY created_at DESC LIMIT 20";
