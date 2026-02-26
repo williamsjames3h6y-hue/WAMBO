@@ -98,15 +98,20 @@ try {
         $updateTrainingStmt->execute();
 
         // Send Telegram notification
-        require_once __DIR__ . '/includes/telegram.php';
-        $telegram = new TelegramNotifier();
-        $telegram->sendTrainingComplete($userData['full_name'], $userData['email']);
+        try {
+            require_once __DIR__ . '/../includes/telegram.php';
+            $telegram = new TelegramNotifier();
+            $telegram->sendTrainingComplete($userData['full_name'], $userData['email']);
+        } catch (Exception $e) {
+            // Telegram notification failed, but continue
+            error_log("Telegram notification failed: " . $e->getMessage());
+        }
 
-        // Redirect to main login page with message
+        // Redirect to main dashboard with success message
         $_SESSION['training_complete'] = true;
-        $_SESSION['success'] = 'Training completed! Please login with your personal account to continue.';
-        session_destroy();
-        redirect('/login.php');
+        $_SESSION['success'] = 'Congratulations! Training completed successfully. View Tasks is now unlocked!';
+        echo json_encode(['success' => true, 'redirect' => '/dashboard.php', 'training_complete' => true]);
+        exit;
     }
 
     $_SESSION['success'] = 'Task submitted successfully! $' . number_format($amount, 2) . ' added to your balance.';

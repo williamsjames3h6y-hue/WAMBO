@@ -590,5 +590,137 @@ try {
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
+
+    <!-- Preloader -->
+    <div id="preloader" class="preloader">
+        <div class="square-loader">
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+        </div>
+        <p class="loading-text">Processing task...</p>
+    </div>
+
+    <style>
+        .preloader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .preloader.active {
+            display: flex;
+        }
+
+        .square-loader {
+            width: 120px;
+            height: 120px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .square {
+            background: #ef4444;
+            border-radius: 4px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .square:nth-child(1) { animation-delay: 0s; }
+        .square:nth-child(2) { animation-delay: 0.1s; }
+        .square:nth-child(3) { animation-delay: 0.2s; }
+        .square:nth-child(4) { animation-delay: 0.3s; }
+        .square:nth-child(5) { animation-delay: 0.4s; }
+        .square:nth-child(6) { animation-delay: 0.5s; }
+        .square:nth-child(7) { animation-delay: 0.6s; }
+        .square:nth-child(8) { animation-delay: 0.7s; }
+        .square:nth-child(9) { animation-delay: 0.8s; }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.8);
+                opacity: 0.6;
+            }
+        }
+
+        .loading-text {
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+    </style>
+
+    <script>
+        // Handle form submission with preloader
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form[action="submit_task.php"]');
+            const preloader = document.getElementById('preloader');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Show preloader
+                    preloader.classList.add('active');
+
+                    // Submit form via fetch
+                    const formData = new FormData(form);
+
+                    fetch('submit_task.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        // Try to parse as JSON first
+                        try {
+                            const jsonData = JSON.parse(data);
+                            if (jsonData.training_complete && jsonData.redirect) {
+                                // Training complete, redirect to dashboard after preloader
+                                setTimeout(() => {
+                                    window.location.href = jsonData.redirect;
+                                }, 2000);
+                                return;
+                            }
+                        } catch (e) {
+                            // Not JSON, continue normally
+                        }
+
+                        // Keep preloader for 2 seconds
+                        setTimeout(() => {
+                            // Reload page to show next task
+                            window.location.reload();
+                        }, 2000);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        preloader.classList.remove('active');
+                        alert('Error submitting task. Please try again.');
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
