@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user && password_verify($password, $user['password_hash'])) {
                 // Check if this is a training account
-                if (strpos($user['email'], '@training.earningsllc.com') !== false) {
+                if (strpos($user['email'], '@training.com') !== false) {
                     $error = 'Training accounts must login at the training portal. Please use the training login page.';
                 } else {
                     $_SESSION['user_id'] = $user['id'];

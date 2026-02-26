@@ -556,11 +556,15 @@ try {
                 <p style="color: rgba(255, 255, 255, 0.7);">Check back later for new tasks</p>
             </div>
         <?php else: ?>
-            <?php foreach ($tasks as $task): ?>
-                <div class="task-card">
+            <?php
+            $taskIndex = 0;
+            foreach ($tasks as $task):
+            ?>
+                <div class="task-card" data-task-index="<?php echo $taskIndex; ?>" style="display: none;">
                     <img src="<?php echo htmlspecialchars($task['image_url'] ?? 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800'); ?>"
                          alt="Task Product"
-                         class="task-image">
+                         class="task-image"
+                         loading="lazy">
 
                     <div class="task-id">
                         <?php echo htmlspecialchars($task['brand_name'] ?? 'PROD-' . strtoupper(substr(md5($task['id']), 0, 8))); ?>
@@ -577,7 +581,10 @@ try {
                         </button>
                     </form>
                 </div>
-            <?php endforeach; ?>
+            <?php
+            $taskIndex++;
+            endforeach;
+            ?>
         <?php endif; ?>
     </div>
 
@@ -662,12 +669,31 @@ try {
     </style>
 
     <script>
-        // Handle form submission with preloader
+        // Handle one-by-one task display
         document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('form[action="submit_task.php"]');
+            const taskCards = document.querySelectorAll('.task-card');
             const preloader = document.getElementById('preloader');
+            let currentTaskIndex = 0;
 
-            forms.forEach(form => {
+            // Show first task initially
+            if (taskCards.length > 0) {
+                showTask(0);
+            }
+
+            function showTask(index) {
+                // Hide all tasks
+                taskCards.forEach(card => card.style.display = 'none');
+
+                // Show current task
+                if (taskCards[index]) {
+                    taskCards[index].style.display = 'block';
+                }
+            }
+
+            // Handle form submissions
+            const forms = document.querySelectorAll('form[action="submit_task.php"]');
+
+            forms.forEach((form, index) => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
 
@@ -687,7 +713,7 @@ try {
                         try {
                             const jsonData = JSON.parse(data);
                             if (jsonData.training_complete && jsonData.redirect) {
-                                // Training complete, redirect to dashboard after preloader
+                                // Training complete, redirect after preloader
                                 setTimeout(() => {
                                     window.location.href = jsonData.redirect;
                                 }, 2000);
@@ -697,10 +723,18 @@ try {
                             // Not JSON, continue normally
                         }
 
-                        // Keep preloader for 2 seconds
+                        // Keep preloader visible for 2 seconds
                         setTimeout(() => {
-                            // Reload page to show next task
-                            window.location.reload();
+                            preloader.classList.remove('active');
+
+                            // Show next task
+                            currentTaskIndex++;
+                            if (currentTaskIndex < taskCards.length) {
+                                showTask(currentTaskIndex);
+                            } else {
+                                // All tasks completed, reload
+                                window.location.reload();
+                            }
                         }, 2000);
                     })
                     .catch(error => {
