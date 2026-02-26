@@ -1,30 +1,39 @@
 <?php
-require_once __DIR__ . '/config/config.php';
-
-// If already logged in, redirect to dashboard
-if (isLoggedIn()) {
-    redirect('/dashboard');
-}
+session_start();
+require_once 'config/database.php';
 
 $error = '';
-$loading = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = sanitizeInput($_POST['email'] ?? '');
+    $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if (!empty($email) && !empty($password)) {
-        require_once __DIR__ . '/includes/auth.php';
-        $auth = new Auth();
-        $result = $auth->login($email, $password);
-
-        if ($result['success']) {
-            redirect('/dashboard');
-        } else {
-            $error = $result['message'];
-        }
+    if (empty($email) || empty($password)) {
+        $error = 'Please fill in all fields';
     } else {
-        $error = 'Please enter both email and password';
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+
+            $query = "SELECT * FROM users WHERE email = :email LIMIT 1";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['username'] = $user['username'];
+                header('Location: dashboard.php');
+                exit;
+            } else {
+                $error = 'Invalid email or password';
+            }
+        } catch (PDOException $e) {
+            $error = 'Login failed: ' . $e->getMessage();
+        }
     }
 }
 ?>
@@ -34,263 +43,410 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - EarningsLLC</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/jpeg" href="/public/logo.jpg">
     <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent);
+            border-radius: 50%;
+            top: -250px;
+            left: -250px;
+            animation: float 8s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent);
+            border-radius: 50%;
+            bottom: -200px;
+            right: -200px;
+            animation: float 10s ease-in-out infinite reverse;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
+        .login-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            min-height: 650px;
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
         }
 
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .login-form-section {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .animate-slideUp {
-            animation: slideUp 0.6s ease-out;
-        }
-
-        .animate-scaleIn {
-            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .animate-slideInRight {
-            animation: slideInRight 0.6s ease-out;
-        }
-
-        .animate-delay-100 {
-            animation-delay: 0.1s;
-            opacity: 0;
-            animation-fill-mode: forwards;
-        }
-
-        .animate-delay-200 {
-            animation-delay: 0.2s;
-            opacity: 0;
-            animation-fill-mode: forwards;
-        }
-
-        .animate-delay-300 {
-            animation-delay: 0.3s;
-            opacity: 0;
-            animation-fill-mode: forwards;
-        }
-
-        .input-group {
-            transition: all 0.3s ease;
-        }
-
-        .input-group:focus-within {
-            transform: translateY(-2px);
-        }
-
-        .input-group input:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn-hover {
-            transition: all 0.3s ease;
+        .login-image-section {
+            flex: 1;
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
             overflow: hidden;
         }
 
-        .btn-hover::before {
+        .login-image-section::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: drift 25s linear infinite;
+        }
+
+        .login-image-section::after {
+            content: '💵';
+            position: absolute;
+            font-size: 12rem;
+            opacity: 0.08;
+            animation: float 7s ease-in-out infinite;
+            filter: blur(2px);
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
         }
 
-        .btn-hover:hover::before {
-            width: 300px;
-            height: 300px;
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 15%;
+            animation: float 6s ease-in-out infinite;
         }
 
-        .btn-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.6);
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 80%;
+            animation: float 8s ease-in-out infinite reverse;
         }
 
-        .btn-hover:active {
-            transform: translateY(-1px);
+        .shape:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 80%;
+            left: 30%;
+            animation: float 7s ease-in-out infinite;
         }
 
-        .bg-animated {
-            background-image: url('/public/image copy.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+        @keyframes drift {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(30px, 30px) rotate(360deg); }
+        }
+
+        .image-content {
             position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 50px;
+            animation: fadeIn 1.2s ease-out;
         }
 
-        .bg-animated::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(16, 185, 129, 0.2) 100%);
+        .image-content h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             animation: pulse 4s ease-in-out infinite;
         }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+
+        .image-content p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            opacity: 0.95;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-login:active {
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .links a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .divider {
+            margin: 20px 0;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .support-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .support-link:hover {
+            color: #059669;
+        }
+
+        @media (max-width: 968px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-image-section {
+                order: -1;
+                min-height: 250px;
+            }
+
+            .login-form-section {
+                padding: 40px 30px;
+            }
+
+            .image-content h2 {
+                font-size: 1.8rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen bg-animated">
-    <div class="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
-        <div class="glass-effect rounded-3xl w-full max-w-md relative animate-scaleIn">
-            <a href="index.php" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform duration-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </a>
+<body>
+    <div class="login-container">
+        <!-- Left Side - Login Form -->
+        <div class="login-form-section">
+            <div class="logo">💰 EarningsLLC</div>
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Sign in to access your earnings dashboard</p>
 
-            <div class="p-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2 animate-slideUp">
-                    Welcome Back
-                </h2>
-                <p class="text-gray-600 mb-8 animate-slideUp animate-delay-100">
-                    Sign in to access your annotation workspace
-                </p>
+            <?php if ($error): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
-                <form method="POST" action="" class="space-y-5">
-                    <div class="animate-slideUp animate-delay-200">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address
-                        </label>
-                        <div class="relative input-group">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <input
-                                type="email"
-                                name="email"
-                                value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="you@example.com"
-                                required
-                            />
-                        </div>
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                        >
                     </div>
-
-                    <div class="animate-slideUp animate-delay-300">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Password
-                        </label>
-                        <div class="relative input-group">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                            <input
-                                type="password"
-                                name="password"
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="••••••••"
-                                required
-                                minlength="6"
-                            />
-                        </div>
-                    </div>
-
-                    <?php if (!empty($error)): ?>
-                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                        <?php echo htmlspecialchars($error); ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <button
-                        type="submit"
-                        class="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 btn-hover animate-slideUp animate-delay-300 relative z-10"
-                    >
-                        <span class="relative z-10">Sign In</span>
-                    </button>
-                </form>
-
-                <div class="mt-6 text-center space-y-3 animate-slideUp animate-delay-300">
-                    <a
-                        href="/register"
-                        class="block text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                    >
-                        Don't have an account? Sign up
-                    </a>
-                    <a
-                        href="https://t.me/EARNINGSLLCONLINECS1"
-                        target="_blank"
-                        class="flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
-                    >
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        Need help? Contact Support
-                    </a>
                 </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+
+            <div class="links">
+                <a href="register.php">Don't have an account? Sign up</a>
+                <div class="divider">or</div>
+                <a href="support.php" class="support-link">
+                    <span>✅</span>
+                    <span>Need help? Contact Support</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Side - Image/Graphic -->
+        <div class="login-image-section">
+            <div class="floating-shapes">
+                <div class="shape"></div>
+                <div class="shape"></div>
+                <div class="shape"></div>
+            </div>
+            <div class="image-content">
+                <h2>Start Earning Today</h2>
+                <p>Join thousands of users who are already making money with our platform. Complete tasks, refer friends, and watch your earnings grow.</p>
             </div>
         </div>
     </div>

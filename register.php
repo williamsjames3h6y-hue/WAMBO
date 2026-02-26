@@ -38,23 +38,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - EarningsLLC</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Create Account - EarningsLLC</title>
     <link rel="icon" type="image/jpeg" href="/public/logo.jpg">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent);
+            border-radius: 50%;
+            top: -250px;
+            left: -250px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent);
+            border-radius: 50%;
+            bottom: -200px;
+            right: -200px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -62,39 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        @keyframes scaleIn {
+        @keyframes slideInLeft {
             from {
                 opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
+                transform: translateX(-50px);
             }
             to {
                 opacity: 1;
@@ -102,224 +104,505 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.8s ease-out;
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .animate-slideUp {
-            animation: slideUp 0.6s ease-out;
+        @keyframes drift {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(30px, 30px) rotate(360deg); }
         }
 
-        .animate-scaleIn {
-            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
         }
 
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
-        .animate-slideInRight {
-            animation: slideInRight 0.6s ease-out;
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
-        .animate-delay-100 {
-            animation-delay: 0.1s;
-            opacity: 0;
-            animation-fill-mode: forwards;
+        .register-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            min-height: 700px;
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
         }
 
-        .animate-delay-200 {
-            animation-delay: 0.2s;
-            opacity: 0;
-            animation-fill-mode: forwards;
+        .register-form-section {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideInLeft 0.8s ease-out;
+            background: white;
         }
 
-        .animate-delay-300 {
-            animation-delay: 0.3s;
-            opacity: 0;
-            animation-fill-mode: forwards;
+        .register-image-section {
+            flex: 1;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.8s ease-out;
         }
 
-        .animate-delay-400 {
-            animation-delay: 0.4s;
-            opacity: 0;
-            animation-fill-mode: forwards;
+        .register-image-section::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: drift 25s linear infinite;
         }
 
-        .input-group {
+        .register-image-section::after {
+            content: '💰';
+            position: absolute;
+            font-size: 12rem;
+            opacity: 0.08;
+            animation: float 7s ease-in-out infinite;
+            filter: blur(2px);
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 15%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 80%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        .shape:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 80%;
+            left: 30%;
+            animation: float 7s ease-in-out infinite;
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 50px;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        .image-content h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: pulse 4s ease-in-out infinite;
+            background: linear-gradient(to right, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .image-content p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            opacity: 0.95;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-list {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            animation: fadeIn 1.5s ease-out;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
             transition: all 0.3s ease;
         }
 
-        .input-group:focus-within {
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(10px);
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+            height: 50px;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 15px;
+            animation: slideInLeft 0.6s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #1e293b;
+            margin-bottom: 12px;
+            font-weight: 800;
+            animation: slideInLeft 0.7s ease-out;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 45px;
+            font-size: 1rem;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+            animation: fadeIn 1s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 18px 16px 52px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            position: relative;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }
 
-        .input-group input:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        input:focus ~ .input-icon {
+            transform: translateY(-50%) scale(1.15);
         }
 
-        .btn-hover {
-            transition: all 0.3s ease;
+        .btn-register {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 15px;
+            animation: fadeIn 1.2s ease-out;
             position: relative;
             overflow: hidden;
         }
 
-        .btn-hover::before {
+        .btn-register::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
         }
 
-        .btn-hover:hover::before {
-            width: 300px;
-            height: 300px;
+        .btn-register:hover::before {
+            left: 100%;
         }
 
-        .btn-hover:hover {
+        .btn-register:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.6);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
         }
 
-        .btn-hover:active {
+        .btn-register:active {
             transform: translateY(-1px);
         }
 
-        .bg-animated {
-            background-image: url('/public/image copy.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
+        .error-message {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            border-left: 5px solid #dc2626;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
         }
 
-        .bg-animated::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(16, 185, 129, 0.2) 100%);
-            animation: pulse 4s ease-in-out infinite;
+        .links {
+            text-align: center;
+            margin-top: 35px;
+            animation: fadeIn 1.3s ease-out;
         }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        .links a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .links a:hover {
+            color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            margin: 22px 0;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .support-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .support-link:hover {
+            color: #059669;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 968px) {
+            .register-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+
+            .register-image-section {
+                order: -1;
+                min-height: 350px;
+            }
+
+            .register-form-section {
+                padding: 45px 35px;
+            }
+
+            .image-content h2 {
+                font-size: 2rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .feature-list {
+                margin-top: 25px;
+            }
+
+            .feature-item {
+                font-size: 0.95rem;
+                padding: 12px 15px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen bg-animated">
-    <div class="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
-        <div class="glass-effect rounded-3xl w-full max-w-md relative animate-scaleIn">
-            <a href="index.php" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform duration-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </a>
+<body>
+    <div class="register-container">
+        <!-- Left Side - Registration Form -->
+        <div class="register-form-section">
+            <div class="logo">
+                <span>💰</span>
+                <span>EarningsLLC</span>
+            </div>
+            <h1>Create Account</h1>
+            <p class="subtitle">Join thousands of users earning money today</p>
 
-            <div class="p-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2 animate-slideUp">
-                    Create Account
-                </h2>
-                <p class="text-gray-600 mb-8 animate-slideUp animate-delay-100">
-                    Join thousands of data scientists and ML engineers
-                </p>
+            <?php if (!empty($error)): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
-                <form method="POST" action="" class="space-y-5">
-                    <div class="animate-slideUp animate-delay-200">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name
-                        </label>
-                        <div class="relative input-group">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            <input
-                                type="text"
-                                name="fullName"
-                                value="<?php echo htmlspecialchars($_POST['fullName'] ?? ''); ?>"
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="John Doe"
-                                required
-                            />
-                        </div>
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="fullName"
+                            name="fullName"
+                            placeholder="John Doe"
+                            required
+                            value="<?php echo htmlspecialchars($_POST['fullName'] ?? ''); ?>"
+                        >
+                        <span class="input-icon">👤</span>
                     </div>
+                </div>
 
-                    <div class="animate-slideUp animate-delay-300">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address
-                        </label>
-                        <div class="relative input-group">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <input
-                                type="email"
-                                name="email"
-                                value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="you@example.com"
-                                required
-                            />
-                        </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                        >
+                        <span class="input-icon">📧</span>
                     </div>
+                </div>
 
-                    <div class="animate-slideUp animate-delay-400">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Password
-                        </label>
-                        <div class="relative input-group">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                            <input
-                                type="password"
-                                name="password"
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                placeholder="••••••••"
-                                required
-                                minlength="6"
-                            />
-                        </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                            minlength="6"
+                        >
+                        <span class="input-icon">🔒</span>
                     </div>
+                </div>
 
-                    <?php if (!empty($error)): ?>
-                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                        <?php echo htmlspecialchars($error); ?>
+                <button type="submit" class="btn-register">Create Account</button>
+            </form>
+
+            <div class="links">
+                <a href="login.php">Already have an account? Sign in</a>
+                <div class="divider">or</div>
+                <a href="https://t.me/EARNINGSLLCONLINECS1" target="_blank" class="support-link">
+                    <span>✅</span>
+                    <span>Need help? Contact Support</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Side - Image/Graphic -->
+        <div class="register-image-section">
+            <div class="floating-shapes">
+                <div class="shape"></div>
+                <div class="shape"></div>
+                <div class="shape"></div>
+            </div>
+            <div class="image-content">
+                <h2>Start Earning Today</h2>
+                <p>Join thousands of users making money with our platform. Complete tasks, refer friends, and watch your earnings grow.</p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">✅</span>
+                        <span>Complete simple tasks and earn</span>
                     </div>
-                    <?php endif; ?>
-
-                    <button
-                        type="submit"
-                        class="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 btn-hover animate-slideUp animate-delay-400 relative z-10"
-                    >
-                        <span class="relative z-10">Create Account</span>
-                    </button>
-                </form>
-
-                <div class="mt-6 text-center space-y-3 animate-slideUp animate-delay-400">
-                    <a
-                        href="/login"
-                        class="block text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                    >
-                        Already have an account? Sign in
-                    </a>
-                    <a
-                        href="https://t.me/EARNINGSLLCONLINECS1"
-                        target="_blank"
-                        class="flex items-center justify-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
-                    >
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        Need help? Contact Support
-                    </a>
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Refer friends for bonuses</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💳</span>
+                        <span>Easy and secure withdrawals</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🎓</span>
+                        <span>Free training included</span>
+                    </div>
                 </div>
             </div>
         </div>
