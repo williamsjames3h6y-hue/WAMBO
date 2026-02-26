@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['username'] = $user['username'] ?? explode('@', $user['email'])[0];
                 $_SESSION['is_training'] = true;
-                header('Location: ../tasks.php');
+                header('Location: /training/tasks.php');
                 exit;
             } else {
                 $error = 'Invalid email or password. Please use your training account credentials.';
