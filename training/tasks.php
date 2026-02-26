@@ -1,15 +1,28 @@
 <?php
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/includes/vip_badge.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-if (!isLoggedIn()) {
-    redirect('/login.php');
+try {
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . '/../includes/vip_badge.php';
+
+    if (!isLoggedIn()) {
+        redirect('/login.php');
+    }
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    if (!$db) {
+        throw new Exception("Database connection failed");
+    }
+
+    $userId = $_SESSION['user_id'];
+} catch (Exception $e) {
+    error_log("Tasks page error: " . $e->getMessage());
+    die("Error loading page. Please contact support. Error: " . htmlspecialchars($e->getMessage()));
 }
-
-$database = new Database();
-$db = $database->getConnection();
-
-$userId = $_SESSION['user_id'];
 
 // Check if daily_task_limit column exists
 $hasTaskLimit = false;
@@ -29,55 +42,61 @@ try {
     $hasTrainingCompleted = false;
 }
 
-$taskLimitField = $hasTaskLimit ? ', vt.daily_task_limit' : '';
-$trainingField = $hasTrainingCompleted ? ', u.training_completed' : '';
-$query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance{$trainingField}
-          FROM user_profiles up
-          LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
-          LEFT JOIN wallets w ON w.user_id = up.id
-          LEFT JOIN users u ON u.id = up.id
-          WHERE up.id = :user_id";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $userId);
-$stmt->execute();
-$userProfile = $stmt->fetch();
+try {
+    $taskLimitField = $hasTaskLimit ? ', vt.daily_task_limit' : '';
+    $trainingField = $hasTrainingCompleted ? ', u.training_completed' : '';
+    $query = "SELECT up.*, vt.level as vip_level, vt.name as vip_name, vt.max_tasks_per_day{$taskLimitField}, w.balance{$trainingField}
+              FROM user_profiles up
+              LEFT JOIN vip_tiers vt ON up.vip_tier_id = vt.id
+              LEFT JOIN wallets w ON w.user_id = up.id
+              LEFT JOIN users u ON u.id = up.id
+              WHERE up.id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $userId);
+    $stmt->execute();
+    $userProfile = $stmt->fetch();
 
-if (!$userProfile) {
-    redirect('/dashboard.php');
+    if (!$userProfile) {
+        redirect('/dashboard.php');
+        exit;
+    }
+
+    $vipLevel = $userProfile['vip_level'] ?? 1;
+    $balance = $userProfile['balance'] ?? 0;
+    $fullName = $userProfile['full_name'] ?? 'User';
+    $isTrainingAccount = isset($userProfile['training_completed']) && !$userProfile['training_completed'];
+    $taskLimit = $userProfile['daily_task_limit'] ?? $userProfile['max_tasks_per_day'] ?? 35;
+
+    // Fetch tasks from admin_tasks table
+    $tasksQuery = "SELECT id, task_order, image_url, brand_name, product_name, price, earning_amount,
+                   'active' as status, created_at
+                   FROM admin_tasks
+                   WHERE vip_level_required <= :vip_level
+                   ORDER BY task_order ASC
+                   LIMIT :task_limit";
+    $tasksStmt = $db->prepare($tasksQuery);
+    $tasksStmt->bindParam(':vip_level', $vipLevel, PDO::PARAM_INT);
+    $tasksStmt->bindParam(':task_limit', $taskLimit, PDO::PARAM_INT);
+    $tasksStmt->execute();
+    $tasks = $tasksStmt->fetchAll();
+
+    $completedQuery = "SELECT COUNT(*) as completed FROM user_task_submissions WHERE user_id = :user_id AND DATE(created_at) = CURDATE()";
+    $completedStmt = $db->prepare($completedQuery);
+    $completedStmt->bindParam(':user_id', $userId);
+    $completedStmt->execute();
+    $completedData = $completedStmt->fetch();
+    $tasksCompleted = $completedData['completed'] ?? 0;
+
+    $earningsQuery = "SELECT COALESCE(SUM(amount), 0) as earnings FROM transactions WHERE user_id = :user_id AND DATE(created_at) = CURDATE() AND type = 'task_completion'";
+    $earningsStmt = $db->prepare($earningsQuery);
+    $earningsStmt->bindParam(':user_id', $userId);
+    $earningsStmt->execute();
+    $earningsData = $earningsStmt->fetch();
+    $earningsToday = $earningsData['earnings'] ?? 0;
+} catch (PDOException $e) {
+    error_log("Database error in tasks page: " . $e->getMessage());
+    die("Database error occurred. Please contact support. Details: " . htmlspecialchars($e->getMessage()));
 }
-
-$vipLevel = $userProfile['vip_level'] ?? 1;
-$balance = $userProfile['balance'] ?? 0;
-$fullName = $userProfile['full_name'] ?? 'User';
-$isTrainingAccount = isset($userProfile['training_completed']) && !$userProfile['training_completed'];
-$taskLimit = $userProfile['daily_task_limit'] ?? $userProfile['max_tasks_per_day'] ?? 35;
-
-// Fetch tasks from admin_tasks table
-$tasksQuery = "SELECT id, task_order, image_url, brand_name, product_name, price, earning_amount,
-               'active' as status, created_at
-               FROM admin_tasks
-               WHERE vip_level_required <= :vip_level
-               ORDER BY task_order ASC
-               LIMIT :task_limit";
-$tasksStmt = $db->prepare($tasksQuery);
-$tasksStmt->bindParam(':vip_level', $vipLevel, PDO::PARAM_INT);
-$tasksStmt->bindParam(':task_limit', $taskLimit, PDO::PARAM_INT);
-$tasksStmt->execute();
-$tasks = $tasksStmt->fetchAll();
-
-$completedQuery = "SELECT COUNT(*) as completed FROM user_task_submissions WHERE user_id = :user_id AND DATE(created_at) = CURDATE()";
-$completedStmt = $db->prepare($completedQuery);
-$completedStmt->bindParam(':user_id', $userId);
-$completedStmt->execute();
-$completedData = $completedStmt->fetch();
-$tasksCompleted = $completedData['completed'] ?? 0;
-
-$earningsQuery = "SELECT COALESCE(SUM(amount), 0) as earnings FROM transactions WHERE user_id = :user_id AND DATE(created_at) = CURDATE() AND type = 'task_completion'";
-$earningsStmt = $db->prepare($earningsQuery);
-$earningsStmt->bindParam(':user_id', $userId);
-$earningsStmt->execute();
-$earningsData = $earningsStmt->fetch();
-$earningsToday = $earningsData['earnings'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
