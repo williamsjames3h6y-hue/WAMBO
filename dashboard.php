@@ -346,28 +346,12 @@ try {
             <p>Track your earnings, referrals, and training progress</p>
         </div>
 
-        <?php if (!$columnExists): ?>
-        <div class="alert">
-            <div class="alert-title">⚠️ Database Setup Required</div>
-            <div class="alert-text">
-                The training system tables are not set up yet. Please run the migration to enable all features:
-                <br><br>
-                <a href="run_training_migration.php" target="_blank">Click here to run the migration</a>
-            </div>
-        </div>
-        <?php endif; ?>
 
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">💵</div>
                 <div class="stat-label">Account Balance</div>
                 <div class="stat-value success">$<?php echo number_format($user['balance'], 2); ?></div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">📚</div>
-                <div class="stat-label">Training Progress</div>
-                <div class="stat-value"><?php echo $trainingProgress; ?> / 7</div>
             </div>
 
             <div class="stat-card">

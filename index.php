@@ -43,7 +43,26 @@ $tiers = $stmt->fetchAll();
             from { opacity: 0; transform: translateX(-30px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        @keyframes ai-fade {
+            0% { opacity: 0; transform: scale(1.05); }
+            5% { opacity: 1; transform: scale(1); }
+            20% { opacity: 1; transform: scale(1); }
+            25% { opacity: 0; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.05); }
+        }
         .animate-float { animation: float 3s ease-in-out infinite; }
+        .ai-slideshow { position: relative; overflow: hidden; }
+        .ai-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            animation: ai-fade 25s infinite;
+        }
+        .ai-slide:nth-child(1) { animation-delay: 0s; }
+        .ai-slide:nth-child(2) { animation-delay: 5s; }
+        .ai-slide:nth-child(3) { animation-delay: 10s; }
+        .ai-slide:nth-child(4) { animation-delay: 15s; }
+        .ai-slide:nth-child(5) { animation-delay: 20s; }
         .animate-shimmer {
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             background-size: 1000px 100%;
@@ -239,7 +258,13 @@ $tiers = $stmt->fetchAll();
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="order-2 lg:order-1">
-                    <img src="/public/AI.jpg" alt="Big Data Processing" class="rounded-2xl shadow-2xl w-full hover:shadow-3xl hover:scale-105 transition-all duration-500 border border-emerald-500/30">
+                    <div class="ai-slideshow rounded-2xl shadow-2xl border border-emerald-500/30" style="height: 500px;">
+                        <img src="/public/AI.jpg" alt="AI Technology 1" class="ai-slide w-full h-full object-cover rounded-2xl">
+                        <img src="/public/AI2.jpg" alt="AI Technology 2" class="ai-slide w-full h-full object-cover rounded-2xl">
+                        <img src="/public/AI3.jpg" alt="AI Technology 3" class="ai-slide w-full h-full object-cover rounded-2xl">
+                        <img src="/public/AI4.jpg" alt="AI Technology 4" class="ai-slide w-full h-full object-cover rounded-2xl">
+                        <img src="/public/AI5.jpg" alt="AI Technology 5" class="ai-slide w-full h-full object-cover rounded-2xl">
+                    </div>
                 </div>
                 <div class="order-1 lg:order-2">
                     <h2 class="text-5xl md:text-6xl font-bold text-white mb-8 drop-shadow-lg">Start Earning Today</h2>
